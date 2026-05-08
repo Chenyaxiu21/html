@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>信火相传 · 我在科大等你来</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #0a1622;
+      font-family: 'Noto Serif SC', 'Times New Roman', '宋体', '仿宋', '楷体', '华文楷体', 'PingFang SC', 'Microsoft YaHei', serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      background-image: radial-gradient(circle at 30% 20%, #1e3b5a 5%, #0a1622 90%);
+    }
+
+    .letter-container {
+      width: 100%;
+      max-width: 460px;
+      background: #faf3e6;
+      background-image: linear-gradient(150deg, #f8efd8 0%, #f1e2c0 100%);
+      border-radius: 28px 28px 24px 24px;
+      box-shadow: 0 25px 45px rgba(0, 0, 0, 0.6), 0 0 0 2px #c7a86b inset, 0 0 0 4px #8b6f4c inset;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .letter-container::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: repeating-linear-gradient(45deg, rgba(180, 150, 100, 0.07) 0px, rgba(180, 150, 100, 0.07) 2px, transparent 2px, transparent 8px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .top-seal {
+      position: relative;
+      z-index: 2;
+      background: linear-gradient(135deg, #8b1a1a 0%, #b12828 100%);
+      padding: 14px 18px;
+      border-bottom: 3px solid #d4af37;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: #f7eac7;
+      font-weight: bold;
+      letter-spacing: 1.5px;
+      text-shadow: 1px 1px 0 #3a0f0f;
+    }
+
+    .seal-text {
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .seal-badge {
+      background: #eec643;
+      color: #1e2f4a;
+      padding: 3px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: bold;
+      background: #f3cd60;
+      box-shadow: 0 0 10px #ffd966;
+    }
+
+    .progress-area {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 14px 16px 2px;
+      background: rgba(237, 224, 196, 0.7);
+      position: relative;
+      z-index: 3;
+    }
+
+    .step-dot {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: #c9b387;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 14px;
+      transition: 0.3s;
+      border: 2px solid #8b6f4c;
+    }
+
+    .step-dot.active {
+      background: #a51d1d;
+      border-color: #d4af37;
+      box-shadow: 0 0 12px #d4af37;
+    }
+
+    .step-line {
+      width: 36px;
+      height: 3px;
+      background: #b5a07e;
+      margin: 0 4px;
+      border-radius: 5px;
+      transition: 0.3s;
+    }
+
+    .step-line.done {
+      background: #d4af37;
+    }
+
+    .form-body {
+      position: relative;
+      z-index: 2;
+      padding: 18px 20px 22px;
+      min-height: 400px;
+    }
+
+    .screen {
+      display: none;
+      animation: fadeIn 0.35s ease;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .title-serif {
+      font-size: 20px;
+      font-weight: 700;
+      color: #2c3a4b;
+      margin-bottom: 16px;
+      border-left: 5px solid #a51d1d;
+      padding-left: 12px;
+      font-family: 'Noto Serif SC', '楷体', serif;
+    }
+
+    .radio-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin: 15px 0 20px;
+    }
+
+    .radio-option {
+      background: #fffcf2;
+      border: 1px solid #dac29c;
+      border-radius: 14px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .radio-option:hover {
+      border-color: #a51d1d;
+      background: #fff6e6;
+    }
+
+    .radio-option input[type="radio"] {
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border: 2px solid #8b6f4c;
+      border-radius: 50%;
+      margin-right: 12px;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .radio-option input[type="radio"]:checked {
+      border-color: #a51d1d;
+      background: #a51d1d;
+      box-shadow: inset 0 0 0 4px #faf3e6;
+    }
+
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="number"] {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 25px;
+      border: 1px solid #c5aa7a;
+      background: #fffef7;
+      font-family: inherit;
+      font-size: 15px;
+      margin: 8px 0 14px;
+      color: #1e2f3f;
+    }
+
+    textarea {
+      width: 100%;
+      border: 1px solid #d4b68a;
+      border-radius: 16px;
+      padding: 14px;
+      font-size: 15px;
+      background: #fffef7;
+      resize: vertical;
+      font-family: inherit;
+      margin: 10px 0 14px;
+      color: #1e2f3f;
+    }
+
+    .quadrant-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 15px 0 10px;
+    }
+
+    .quadrant-card {
+      background: #fef9ed;
+      border: 1px dashed #b49460;
+      border-radius: 14px;
+      padding: 12px 10px;
+      text-align: center;
+      font-size: 13px;
+      cursor: pointer;
+      transition: 0.2s;
+      color: #3e3629;
+      font-weight: 500;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    .quadrant-card:active {
+      background: #f3e3c9;
+      border-color: #a51d1d;
+    }
+
+    .quadrant-icon {
+      font-size: 24px;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .nav-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+
+    .btn {
+      background: #2d3e50;
+      border: none;
+      color: #f7eac7;
+      padding: 10px 24px;
+      border-radius: 30px;
+      font-weight: bold;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: 0.2s;
+      background: #1e2f3f;
+      border-bottom: 3px solid #d4af37;
+      font-family: inherit;
+    }
+
+    .btn.primary {
+      background: #a51d1d;
+      border-bottom: 3px solid #f3cd60;
+    }
+
+    .btn:active {
+      transform: scale(0.97);
+    }
+
+    .envelope-icon {
+      text-align: center;
+      font-size: 42px;
+      margin: 8px 0;
+    }
+
+    .small-note {
+      font-size: 12px;
+      color: #6b5e4b;
+      margin-top: 6px;
+    }
+
+    .success-screen {
+      text-align: center;
+      padding: 20px;
+    }
+
+    .success-screen .big-icon {
+      font-size: 64px;
+      margin-bottom: 15px;
+    }
+
+    .inline-badge {
+      background: #e7dcc7;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      display: inline-block;
+      margin: 8px 0;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="letter-container" id="letterApp">
+    <!-- 标题：信火相传 · 我在科大等你来 -->
+    <div class="top-seal">
+      <span class="seal-text">📮 信火相传 · 我在科大等你来</span>
+      <span class="seal-badge">国防科技大学研究生院</span>
+    </div>
+
+    <!-- 进度条（4步） -->
+    <div class="progress-area" id="progressBar">
+      <div class="step-dot active" id="dot1">1</div>
+      <div class="step-line" id="line1"></div>
+      <div class="step-dot" id="dot2">2</div>
+      <div class="step-line" id="line2"></div>
+      <div class="step-dot" id="dot3">3</div>
+      <div class="step-line" id="line3"></div>
+      <div class="step-dot" id="dot4">4</div>
+    </div>
+
+    <div class="form-body" id="formBody">
+      <!-- 屏幕0: 启封动画 -->
+      <div class="screen active" id="screen0">
+        <div class="envelope-icon">✉️🔐</div>
+        <div class="title-serif" style="text-align:center; border:none;">信火相传</div>
+        <p style="text-align:center; color:#4a3e2c; margin:12px 0;">一封来自心底的信，即将跨越山海。</p>
+        <div style="text-align:center; margin-top:30px;">
+          <button class="btn primary" id="startLetter">📝 开始书写</button>
+        </div>
+      </div>
+
+      <!-- 屏幕1: 寄信人身份建档 -->
+      <div class="screen" id="screen1">
+        <div class="title-serif">🧑‍🎓 第一步 · 你是谁？</div>
+        <label style="font-weight:bold;">身份</label>
+        <div class="radio-group" id="identityGroup">
+          <label class="radio-option"><input type="radio" name="identity" value="student" checked> 🎓 在校学生</label>
+          <label class="radio-option"><input type="radio" name="identity" value="parent"> 👨‍👩‍👧 家长</label>
+          <label class="radio-option"><input type="radio" name="identity" value="other"> 🧑‍🏫 其他</label>
+        </div>
+        <!-- 当选择“其他”时显示的具体身份输入框 -->
+        <div id="otherIdentityContainer" class="hidden">
+          <label for="otherIdentityInput" style="font-weight:bold;">请填写具体身份</label>
+          <input type="text" id="otherIdentityInput" placeholder="例如：高中教师、科研工作者…">
+        </div>
+        <label for="ageInput" style="font-weight:bold;">年龄</label>
+        <input type="text" id="ageInput" placeholder="请输入年龄（如22）">
+        <label for="universityInput" style="font-weight:bold;">所在大学（必填）</label>
+        <input type="text" id="universityInput" placeholder="请输入院校全称，如：国防科技大学" required>
+        <label style="font-weight:bold;">你从哪里知道我们？（选填）</label>
+        <div class="radio-group" style="gap:6px;">
+          <label class="radio-option"><input type="radio" name="source" value="wechat"> 📱 公众号推文</label>
+          <label class="radio-option"><input type="radio" name="source" value="douyin"> 🎵 抖音短视频</label>
+          <label class="radio-option"><input type="radio" name="source" value="senior"> 👥 学长/老师推荐</label>
+          <label class="radio-option"><input type="radio" name="source" value="other_source"> 🌐 其他</label>
+        </div>
+        <div id="refereeHint" style="background:#f3e3c9; padding:8px 14px; border-radius:20px; margin-top:10px; display:none; font-size:14px;"></div>
+        <div class="nav-buttons">
+          <button class="btn" id="backTo0">← 返回</button>
+          <button class="btn primary" id="toScreen2">下一步 · 书写心语</button>
+        </div>
+      </div>
+
+      <!-- 屏幕2: 四象限书写 -->
+      <div class="screen" id="screen2">
+        <div class="title-serif">✍️ 第二步 · 你的心声</div>
+        <p style="font-size:13px; color:#5c4d36; margin-bottom:6px;">点击象限，可快速填入引导语（也可自由书写）</p>
+        <div class="quadrant-grid">
+          <div class="quadrant-card" data-quadrant="policy">
+            <span class="quadrant-icon">📋</span> 迷彩青春问
+          </div>
+          <div class="quadrant-card" data-quadrant="research">
+            <span class="quadrant-icon">🔬</span> 科研攀登感
+          </div>
+          <div class="quadrant-card" data-quadrant="life">
+            <span class="quadrant-icon">⚽</span> 军校生活探
+          </div>
+          <div class="quadrant-card" data-quadrant="dream">
+            <span class="quadrant-icon">🚀</span> 远大理想志
+          </div>
+        </div>
+        <textarea id="messageText" rows="5" placeholder="写下你的困惑、迷茫、好奇或梦想…"></textarea>
+        <div class="nav-buttons">
+          <button class="btn" id="backTo1">← 返回</button>
+          <button class="btn primary" id="toScreen3">下一步 · 回信形式</button>
+        </div>
+      </div>
+
+      <!-- 屏幕3: 回信形式选择 -->
+      <div class="screen" id="screen3">
+        <div class="title-serif">📨 第三步 · 希望收到的回信形式</div>
+        <div style="margin:20px 0;">
+          <div style="display:flex; flex-direction:column; gap:14px;">
+            <label class="radio-option" style="margin:0;">
+              <input type="radio" name="replyType" value="A" checked> 📄 A级·电子信（加盖电子邮戳的长图回信）
+            </label>
+            <label class="radio-option" style="margin:0;">
+              <input type="radio" name="replyType" value="S"> 🎧 S级·有声信（回复人亲自朗读，配背景音乐）
+            </label>
+          </div>
+        </div>
+        <div class="nav-buttons">
+          <button class="btn" id="backTo2">← 返回</button>
+          <button class="btn primary" id="toScreen4">最后一步 · 接收方式</button>
+        </div>
+      </div>
+
+      <!-- 屏幕4: 邮箱与提交 -->
+      <div class="screen" id="screen4">
+        <div class="title-serif">📬 最后一步 · 回信寄往哪里？</div>
+        <label>📧 邮箱（必填，回信唯一通道）</label>
+        <input type="email" id="emailInput" placeholder="yourname@example.com" required>
+        <div class="checkbox-item" style="margin-top:15px;">
+          <input type="checkbox" id="privacyConsent"> 🔒 我已阅读并同意<span style="color:#a51d1d;">隐私保护条款</span>（信件仅回信人可见）
+        </div>
+        <div class="nav-buttons">
+          <button class="btn" id="backTo3">← 返回</button>
+          <button class="btn primary" id="submitLetter">📮 投递心语</button>
+        </div>
+        <p class="small-note" style="text-align:center;">⏳ 承诺15个工作日内回信</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      // 屏幕管理
+      const screens = {
+        s0: document.getElementById('screen0'),
+        s1: document.getElementById('screen1'),
+        s2: document.getElementById('screen2'),
+        s3: document.getElementById('screen3'),
+        s4: document.getElementById('screen4')
+      };
+      const dots = {
+        d1: document.getElementById('dot1'),
+        d2: document.getElementById('dot2'),
+        d3: document.getElementById('dot3'),
+        d4: document.getElementById('dot4')
+      };
+      const lines = {
+        l1: document.getElementById('line1'),
+        l2: document.getElementById('line2'),
+        l3: document.getElementById('line3')
+      };
+
+      let currentScreen = 0;
+      const screenToProgress = {0:0, 1:1, 2:2, 3:3, 4:4};
+
+      function showScreen(n) {
+        Object.values(screens).forEach(s => s.classList.remove('active'));
+        const key = 's'+n;
+        if (screens[key]) screens[key].classList.add('active');
+        currentScreen = n;
+        updateProgress();
+      }
+
+      function updateProgress() {
+        const activeCount = screenToProgress[currentScreen] || 0;
+        [dots.d1, dots.d2, dots.d3, dots.d4].forEach(d => d.className = 'step-dot');
+        [lines.l1, lines.l2, lines.l3].forEach(l => l.className = 'step-line');
+        if (activeCount >= 1) dots.d1.classList.add('active');
+        if (activeCount >= 2) {
+          dots.d2.classList.add('active');
+          lines.l1.classList.add('done');
+        }
+        if (activeCount >= 3) {
+          dots.d3.classList.add('active');
+          lines.l2.classList.add('done');
+        }
+        if (activeCount >= 4) {
+          dots.d4.classList.add('active');
+          lines.l3.classList.add('done');
+        }
+      }
+
+      // 推荐人参数读取
+      function getQueryParam(param) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(param);
+      }
+      const referee = getQueryParam('ref');
+      if (referee) {
+        const hintDiv = document.getElementById('refereeHint');
+        hintDiv.innerText = `🎖️ 推荐人：${decodeURIComponent(referee)}`;
+        hintDiv.style.display = 'block';
+        const seniorRadio = document.querySelector('input[name="source"][value="senior"]');
+        if (seniorRadio) seniorRadio.checked = true;
+      }
+
+      // 监听身份选择，显示/隐藏“其他”身份输入框
+      const identityRadios = document.querySelectorAll('input[name="identity"]');
+      const otherContainer = document.getElementById('otherIdentityContainer');
+      const otherInput = document.getElementById('otherIdentityInput');
+
+      function toggleOtherIdentity() {
+        const selected = document.querySelector('input[name="identity"]:checked');
+        if (selected && selected.value === 'other') {
+          otherContainer.classList.remove('hidden');
+        } else {
+          otherContainer.classList.add('hidden');
+          if (otherInput) otherInput.value = '';
+        }
+      }
+
+      identityRadios.forEach(radio => {
+        radio.addEventListener('change', toggleOtherIdentity);
+      });
+      // 初始状态
+      toggleOtherIdentity();
+
+      // 按钮事件
+      document.getElementById('startLetter').addEventListener('click', () => showScreen(1));
+      document.getElementById('backTo0').addEventListener('click', () => showScreen(0));
+      document.getElementById('toScreen2').addEventListener('click', () => {
+        const identity = document.querySelector('input[name="identity"]:checked');
+        if (!identity) { alert('请选择您的身份'); return; }
+        if (identity.value === 'other' && !otherInput.value.trim()) {
+          alert('请填写具体身份');
+          return;
+        }
+        const university = document.getElementById('universityInput').value.trim();
+        if (!university) {
+          alert('请填写所在大学');
+          return;
+        }
+        showScreen(2);
+      });
+      document.getElementById('backTo1').addEventListener('click', () => showScreen(1));
+      document.getElementById('toScreen3').addEventListener('click', () => showScreen(3));
+      document.getElementById('backTo2').addEventListener('click', () => showScreen(2));
+      document.getElementById('toScreen4').addEventListener('click', () => showScreen(4));
+      document.getElementById('backTo3').addEventListener('click', () => showScreen(3));
+
+      // 象限点击填入引导语
+      const quadrantGuides = {
+        policy: '我想了解具体的报考政策、体检标准、专业选择等问题。',
+        research: '我正在做某方向的课题，感到迷茫，请问科大的学长是如何度过科研瓶颈期的？',
+        life: '我想知道军校生的一天是怎么过的？除了科研，能打球、弹吉他吗？',
+        dream: '我梦想设计战斗机/攻克超算难题，离这个梦想还有多远？'
+      };
+      document.querySelectorAll('.quadrant-card').forEach(card => {
+        card.addEventListener('click', function() {
+          const key = this.dataset.quadrant;
+          const textarea = document.getElementById('messageText');
+          if (textarea.value.trim() === '') {
+            textarea.value = quadrantGuides[key] || '';
+          } else {
+            textarea.value += '\n' + (quadrantGuides[key] || '');
+          }
+        });
+      });
+
+      // 提交信件
+      document.getElementById('submitLetter').addEventListener('click', function() {
+        const email = document.getElementById('emailInput').value.trim();
+        if (!email || !email.includes('@') || !email.includes('.')) {
+          alert('请填写有效的邮箱地址，以便我们回信。');
+          return;
+        }
+        if (!document.getElementById('privacyConsent').checked) {
+          alert('请阅读并同意隐私保护条款。');
+          return;
+        }
+
+        const identityRadio = document.querySelector('input[name="identity"]:checked');
+        const identity = identityRadio ? identityRadio.value : '';
+        const otherIdentity = (identity === 'other') ? otherInput.value.trim() : '';
+        const age = document.getElementById('ageInput').value.trim();
+        const university = document.getElementById('universityInput').value.trim();
+        const sourceRadio = document.querySelector('input[name="source"]:checked');
+        const source = sourceRadio ? sourceRadio.value : '';
+        const message = document.getElementById('messageText').value.trim();
+        const replyTypeRadio = document.querySelector('input[name="replyType"]:checked');
+        const replyType = replyTypeRadio ? replyTypeRadio.value : 'A';
+
+        const letterData = {
+          identity,
+          otherIdentity: otherIdentity || null,
+          age,
+          university,
+          source,
+          referee: referee || null,
+          message,
+          replyType,
+          email,
+          timestamp: new Date().toISOString(),
+          campaign: '信火相传'
+        };
+
+        console.log('📨 信件数据：', letterData);
+	// 在 console.log(letterData) 之后，成功页渲染之前添加：
+	let allLetters = JSON.parse(localStorage.getItem('xinhuo_letters') || '[]');
+	allLetters.push(letterData);
+	localStorage.setItem('xinhuo_letters', JSON.stringify(allLetters));
+        // 实际项目中这里提交到后端API
+
+        // 成功页
+        document.getElementById('formBody').innerHTML = `
+          <div class="success-screen">
+            <div class="big-icon">✉️✨</div>
+            <h2 style="color:#2c3a4b; font-family:'楷体',serif;">信已寄出，静候回响</h2>
+            <p style="margin:16px 0; color:#3d3221;">你的心声已抵达国防科大研究生院。</p>
+            <div class="inline-badge">📬 我们将于 <strong>15个工作日</strong> 内回复至 ${email}</div>
+            <p style="margin-top:20px; font-style:italic; color:#a51d1d;">“跨越山海的回信，我在科大等你来。”</p>
+            <p style="margin-top:25px; color:#4a3e2c; line-height:1.8;">感谢您的来信，每一份真挚的倾诉我们都视若珍宝。<br>愿这封信成为您追梦路上的一盏微光，<br>国防科大研究生院，始终与奋斗者同行。</p>
+          </div>
+        `;
+        // 进度条全亮
+        Object.values(dots).forEach(d => d.classList.add('active'));
+        Object.values(lines).forEach(l => l.classList.add('done'));
+      });
+
+      updateProgress();
+    })();
+  </script>
+</body>
+</html>
