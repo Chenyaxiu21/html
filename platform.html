@@ -121,14 +121,45 @@
   </div>
 
   <script>
-    const STORAGE_KEY = 'xinhuo_letters';
+    // ===== 请替换成你的 JSONBin 信息（和 index.html 里的一样） =====
+    const BIN_ID = '69fd580eadc21f119a6cec54';
+    const MASTER_KEY = '$2a$10$lViKxa8mlqMOUQ5u0jAxIetNJPAAYIsFbAU2r7eAwmMLFAKJ4844W';
 
-    function getLetters() {
-      return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    // ===== 数据读取 =====
+    async function getLetters() {
+      try {
+        const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+          headers: { 'X-Master-Key': MASTER_KEY }
+        });
+        if (!res.ok) throw new Error('读取失败');
+        const data = await res.json();
+        // 你的 index.html 存的是纯数组，所以 data.record 就是数组
+        const record = data.record;
+        if (Array.isArray(record)) return record;
+        // 兼容意外情况
+        if (record && Array.isArray(record.letters)) return record.letters;
+        return [];
+      } catch (err) {
+        console.error('获取信件出错：', err);
+        return [];
+      }
     }
 
-    function saveLetters(letters) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(letters));
+    async function saveLetters(letters) {
+      try {
+        // 纯数组格式，直接 PUT 数组本身
+        const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Master-Key': MASTER_KEY
+          },
+          body: JSON.stringify(letters)  // 纯数组
+        });
+        if (!res.ok) throw new Error('保存失败');
+      } catch (err) {
+        console.error('保存信件出错：', err);
+      }
     }
 
     function formatDate(iso) {
@@ -144,6 +175,14 @@
       return val;
     }
 
+    // 用一个唯一的字符串标识每封信（因为目前没有 id 字段，用 email+timestamp 组合）
+    function getLetterKey(l) {
+      return `${l.email}||${l.timestamp}`;
+    }
+
+    // 当前数据缓存
+    let allLetters = [];
+
     // 渲染表格
     function render(letters) {
       const tbody = document.getElementById('tableBody');
@@ -153,21 +192,23 @@
         emptyHint.style.display = 'block';
       } else {
         emptyHint.style.display = 'none';
-        tbody.innerHTML = letters.map((l, idx) => `
+        tbody.innerHTML = letters.map((l) => {
+          const key = getLetterKey(l);
+          return `
           <tr>
             <td><span class="identity-tag">${getIdentityLabel(l.identity, l.otherIdentity)}</span></td>
             <td>${l.age || '-'}</td>
             <td>${l.university || '-'}</td>
-            <td class="msg-preview" onclick="showDetail(${idx})">${l.message ? l.message.slice(0,20) + '…' : '-'}</td>
+            <td class="msg-preview" onclick="showDetail('${key}')">${l.message ? l.message.slice(0,20) + '…' : '-'}</td>
             <td>${l.replyType === 'S' ? '<span class="reply-badge">S级有声</span>' : 'A级电子'}</td>
             <td>${l.email || '-'}</td>
             <td>${formatDate(l.timestamp)}</td>
             <td>${l.replied ? '<span class="reply-badge replied">已回复</span>' : '<span class="reply-badge">待回复</span>'}</td>
             <td>
-              <button class="btn btn-reply" ${l.replied ? 'disabled' : ''} onclick="markReplied(${idx})">${l.replied ? '已回复' : '标记回复'}</button>
+              <button class="btn btn-reply" ${l.replied ? 'disabled' : ''} onclick="markReplied('${key}')">${l.replied ? '已回复' : '标记回复'}</button>
             </td>
           </tr>
-        `).join('');
+        `}).join('');
       }
       updateStats(letters);
     }
@@ -184,38 +225,38 @@
       document.getElementById('sCount').innerText = sCount;
     }
 
-    // 筛选逻辑
-    function applyFilters() {
-      let letters = getLetters();
+    // 加载并应用筛选
+    async function loadAndApplyFilters() {
+      allLetters = await getLetters();
       const identity = document.getElementById('filterIdentity').value;
       const university = document.getElementById('filterUniversity').value.trim().toLowerCase();
       const replyType = document.getElementById('filterReplyType').value;
       const dateFrom = document.getElementById('filterDateFrom').value;
       const dateTo = document.getElementById('filterDateTo').value;
 
-      if (identity) letters = letters.filter(l => l.identity === identity);
-      if (university) letters = letters.filter(l => l.university && l.university.toLowerCase().includes(university));
-      if (replyType) letters = letters.filter(l => l.replyType === replyType);
-      if (dateFrom) letters = letters.filter(l => l.timestamp >= dateFrom);
-      if (dateTo) letters = letters.filter(l => l.timestamp <= dateTo + 'T23:59:59');
+      let filtered = [...allLetters];
+      if (identity) filtered = filtered.filter(l => l.identity === identity);
+      if (university) filtered = filtered.filter(l => l.university && l.university.toLowerCase().includes(university));
+      if (replyType) filtered = filtered.filter(l => l.replyType === replyType);
+      if (dateFrom) filtered = filtered.filter(l => l.timestamp >= dateFrom);
+      if (dateTo) filtered = filtered.filter(l => l.timestamp <= dateTo + 'T23:59:59');
 
-      render(letters);
+      render(filtered);
     }
 
-    document.getElementById('applyFilter').addEventListener('click', applyFilters);
-    document.getElementById('resetFilter').addEventListener('click', () => {
+    document.getElementById('applyFilter').addEventListener('click', loadAndApplyFilters);
+    document.getElementById('resetFilter').addEventListener('click', async () => {
       document.getElementById('filterIdentity').value = '';
       document.getElementById('filterUniversity').value = '';
       document.getElementById('filterReplyType').value = '';
       document.getElementById('filterDateFrom').value = '';
       document.getElementById('filterDateTo').value = '';
-      render(getLetters());
+      await loadAndApplyFilters();
     });
 
     // 详情模态框
-    function showDetail(idx) {
-      const letters = getLetters();
-      const l = letters[idx];
+    function showDetail(key) {
+      const l = allLetters.find(letter => getLetterKey(letter) === key);
       if (!l) return;
       const content = `
         <p><strong>身份：</strong>${getIdentityLabel(l.identity, l.otherIdentity)}</p>
@@ -242,24 +283,23 @@
     });
 
     // 标记已回复
-    function markReplied(idx) {
-      let letters = getLetters();
-      if (letters[idx]) {
+    async function markReplied(key) {
+      const letters = await getLetters();  // 从云端拉取最新数据
+      const idx = letters.findIndex(l => getLetterKey(l) === key);
+      if (idx !== -1) {
         letters[idx].replied = true;
-        saveLetters(letters);
-        applyFilters(); // 重新应用当前筛选并渲染
+        await saveLetters(letters);
+        await loadAndApplyFilters();  // 重新加载并渲染
       }
     }
 
     // 初始渲染
-    render(getLetters());
+    loadAndApplyFilters();
 
-    // 监听本地存储变化（其他标签页修改时自动刷新）
-    window.addEventListener('storage', (e) => {
-      if (e.key === STORAGE_KEY) {
-        applyFilters();
-      }
-    });
+    // 定时刷新（每 30 秒自动拉取一次新数据）
+    setInterval(() => {
+      loadAndApplyFilters();
+    }, 30000);
   </script>
 </body>
 </html>
