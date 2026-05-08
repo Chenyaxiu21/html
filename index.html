@@ -616,16 +616,35 @@
           message,
           replyType,
           email,
+		  replied: false, 
           timestamp: new Date().toISOString(),
           campaign: '信火相传'
         };
 
         console.log('📨 信件数据：', letterData);
-	// 在 console.log(letterData) 之后，成功页渲染之前添加：
-	let allLetters = JSON.parse(localStorage.getItem('xinhuo_letters') || '[]');
-	allLetters.push(letterData);
-	localStorage.setItem('xinhuo_letters', JSON.stringify(allLetters));
-        // 实际项目中这里提交到后端API
+		const BIN_ID = '69fd580eadc21f119a6cec54';          // 替换为你的 Bin ID
+	    const MASTER_KEY = '$2a$10$lViKxa8mlqMOUQ5u0jAxIetNJPAAYIsFbAU2r7eAwmMLFAKJ4844W';   // 替换为你的 Master Key
+	    
+	    try {
+	        // 1️⃣ 先从 JSONBin 获取已有信件
+	        const getResponse = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+	            headers: { 'X-Master-Key': MASTER_KEY }
+	        });
+	        const getData = await getResponse.json();
+	        const existingLetters = getData.record || [];
+	        
+	        // 2️⃣ 把新信件追加进去
+	        existingLetters.push(letterData);
+	        
+	        // 3️⃣ 更新 JSONBin 上的数据
+	        await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+	            method: 'PUT',
+	            headers: {
+	                'Content-Type': 'application/json',
+	                'X-Master-Key': MASTER_KEY
+	            },
+	            body: JSON.stringify(existingLetters)
+	        });
 
         // 成功页
         document.getElementById('formBody').innerHTML = `
