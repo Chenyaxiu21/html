@@ -622,9 +622,9 @@
 
         console.log('📨 信件数据：', letterData);
 	// 在 console.log(letterData) 之后，成功页渲染之前添加：
-	let allLetters = JSON.parse(localStorage.getItem('xinhuo_letters') || '[]');
-	allLetters.push(letterData);
-	localStorage.setItem('xinhuo_letters', JSON.stringify(allLetters));
+		let allLetters = JSON.parse(localStorage.getItem('xinhuo_letters') || '[]');
+		allLetters.push(letterData);
+		localStorage.setItem('xinhuo_letters', JSON.stringify(allLetters));
         // 实际项目中这里提交到后端API
 
         // 成功页
