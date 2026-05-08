@@ -584,7 +584,7 @@
       });
 
       // 提交信件
-      document.getElementById('submitLetter').addEventListener('click', function() {
+      document.getElementById('submitLetter').addEventListener('click', async function() {
         const email = document.getElementById('emailInput').value.trim();
         if (!email || !email.includes('@') || !email.includes('.')) {
           alert('请填写有效的邮箱地址，以便我们回信。');
