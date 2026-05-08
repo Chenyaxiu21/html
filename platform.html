@@ -133,10 +133,8 @@
         });
         if (!res.ok) throw new Error('读取失败');
         const data = await res.json();
-        // 你的 index.html 存的是纯数组，所以 data.record 就是数组
         const record = data.record;
         if (Array.isArray(record)) return record;
-        // 兼容意外情况
         if (record && Array.isArray(record.letters)) return record.letters;
         return [];
       } catch (err) {
@@ -147,14 +145,13 @@
 
     async function saveLetters(letters) {
       try {
-        // 纯数组格式，直接 PUT 数组本身
         const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
             'X-Master-Key': MASTER_KEY
           },
-          body: JSON.stringify(letters)  // 纯数组
+          body: JSON.stringify(letters)
         });
         if (!res.ok) throw new Error('保存失败');
       } catch (err) {
@@ -175,11 +172,6 @@
       return val;
     }
 
-    // 用一个唯一的字符串标识每封信（因为目前没有 id 字段，用 email+timestamp 组合）
-    function getLetterKey(l) {
-      return `${l.email}||${l.timestamp}`;
-    }
-
     // 当前数据缓存
     let allLetters = [];
 
@@ -193,7 +185,8 @@
       } else {
         emptyHint.style.display = 'none';
         tbody.innerHTML = letters.map((l) => {
-          const key = getLetterKey(l);
+          // 优先使用 id，如果没有则用 email+timestamp 作为后备
+          const key = l.id || `${l.email}||${l.timestamp}`;
           return `
           <tr>
             <td><span class="identity-tag">${getIdentityLabel(l.identity, l.otherIdentity)}</span></td>
@@ -256,7 +249,7 @@
 
     // 详情模态框
     function showDetail(key) {
-      const l = allLetters.find(letter => getLetterKey(letter) === key);
+      const l = allLetters.find(letter => (letter.id || `${letter.email}||${letter.timestamp}`) === key);
       if (!l) return;
       const content = `
         <p><strong>身份：</strong>${getIdentityLabel(l.identity, l.otherIdentity)}</p>
@@ -284,12 +277,11 @@
 
     // 标记已回复
     async function markReplied(key) {
-      const letters = await getLetters();  // 从云端拉取最新数据
-      const idx = letters.findIndex(l => getLetterKey(l) === key);
+      const idx = allLetters.findIndex(l => (l.id || `${l.email}||${l.timestamp}`) === key);
       if (idx !== -1) {
-        letters[idx].replied = true;
-        await saveLetters(letters);
-        await loadAndApplyFilters();  // 重新加载并渲染
+        allLetters[idx].replied = true;
+        await saveLetters(allLetters);
+        await loadAndApplyFilters();
       }
     }
 
