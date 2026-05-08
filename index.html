@@ -115,7 +115,7 @@
       background: #2d3e50; border: none; color: #f7eac7; padding: 10px 24px;
       border-radius: 30px; font-weight: bold; letter-spacing: 1px; cursor: pointer;
       transition: 0.2s; background: #1e2f3f; border-bottom: 3px solid #d4af37;
-      font-family: inherit; touch-action: manipulation; /* 提升移动端点击响应 */
+      font-family: inherit; touch-action: manipulation;
     }
     .btn.primary { background: #a51d1d; border-bottom: 3px solid #f3cd60; }
     .btn:active { transform: scale(0.97); }
@@ -295,7 +295,7 @@
       const referee = getQueryParam('ref');
       if (referee) {
         const hintDiv = document.getElementById('refereeHint');
-        hintDiv.innerText = `🎖️ 推荐人：${decodeURIComponent(referee)}`;
+        hintDiv.innerText = '🎖️ 推荐人：' + decodeURIComponent(referee);
         hintDiv.style.display = 'block';
         const seniorRadio = document.querySelector('input[name="source"][value="senior"]');
         if (seniorRadio) seniorRadio.checked = true;
@@ -380,7 +380,7 @@
         const replyType = replyTypeRadio ? replyTypeRadio.value : 'A';
 
         const letterData = {
-          id: Date.now().toString(36) + Math.random().toString(36).substr(2, 6), // 唯一ID
+          id: Date.now().toString(36) + Math.random().toString(36).substr(2, 6),
           identity,
           otherIdentity: otherIdentity || null,
           age,
@@ -396,22 +396,64 @@
         };
 
         console.log('📨 信件数据：', letterData);
-        const BIN_ID = '69fd580eadc21f119a6cec54';          // ⚠️ 你的 Bin ID
-        const MASTER_KEY = '$2a$10$lViKxa8mlqMOUQ5u0jAxIetNJPAAYIsFbAU2r7eAwmMLFAKJ4844W'; // ⚠️ 已暴露，请立即重置！
+
+        // ⚠️ 请替换为你自己的 JSONBin.io 凭据
+        // 1. 去 https://jsonbin.io 注册账号
+        // 2. 创建一个 Bin（初始内容设为 [] ）
+        // 3. 复制你的 BIN_ID 和 X-Master-Key 替换下面的值
+        const BIN_ID = '69fd580eadc21f119a6cec54';
+        const MASTER_KEY = '$2a$10$lViKxa8mlqMOUQ5u0jAxIetNJPAAYIsFbAU2r7eAwmMLFAKJ4844W';
+
+        console.log('🔄 开始提交到 JSONBin...');
 
         try {
-          // 1. 获取现有信件
-          const getResponse = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
-            headers: { 'X-Master-Key': MASTER_KEY }
-          });
-          const getData = await getResponse.json();
-          const existingLetters = getData.record || [];
+          // 第1步：先测试 JSONBin API 是否可达
+          console.log('📡 正在连接 JSONBin API...');
+          const testUrl = 'https://api.jsonbin.io/v3/b/' + BIN_ID + '/latest';
 
-          // 2. 追加新信件
+          let getResponse;
+          try {
+            getResponse = await fetch(testUrl, {
+              headers: { 'X-Master-Key': MASTER_KEY }
+            });
+          } catch (netErr) {
+            console.error('❌ 网络请求失败:', netErr);
+            // 检查是否是 CORS 或 file:// 协议问题
+            if (window.location.protocol === 'file:') {
+              alert('⚠️ 当前通过 file:// 协议打开，浏览器禁止跨域请求。\n\n请通过本地服务器打开此页面（如使用 Live Server 插件，或部署到服务器上访问）。');
+            } else if (netErr.message && netErr.message.includes('NetworkError')) {
+              alert('⚠️ 网络连接失败，JSONBin.io 服务不可达。\n\n可能原因：\n1. 网络不通，请检查网络连接\n2. JSONBin.io 服务暂时不可用\n3. 浏览器阻止了跨域请求\n\n请打开浏览器控制台 (F12) 查看详细错误。');
+            } else {
+              alert('❌ 提交失败: ' + (netErr.message || '未知网络错误'));
+            }
+            return;
+          }
+
+          console.log('📡 GET 响应状态:', getResponse.status);
+
+          if (!getResponse.ok) {
+            const errText = await getResponse.text();
+            console.error('❌ 读取 Bin 失败:', errText);
+            if (getResponse.status === 401 || getResponse.status === 403) {
+              alert('⚠️ 鉴权失败！\n\nMASTER_KEY 不正确或已失效。请到 JSONBin.io 重新获取 Key 并替换代码中的 MASTER_KEY。');
+            } else if (getResponse.status === 404) {
+              alert('⚠️ Bin 不存在！\n\nBIN_ID 无效或已被删除。请到 JSONBin.io 创建一个新 Bin，并更新代码中的 BIN_ID。');
+            } else {
+              alert('⚠️ 读取数据失败 (HTTP ' + getResponse.status + ')。请打开浏览器控制台 (F12) 查看详情。');
+            }
+            return;
+          }
+
+          const getData = await getResponse.json();
+          console.log('📦 获取到的数据:', getData);
+
+          // 第2步：确保 record 是数组
+          const existingLetters = Array.isArray(getData.record) ? getData.record : [];
           existingLetters.push(letterData);
 
-          // 3. 更新云端数据
-          await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+          // 第3步：写回数据
+          console.log('📤 正在上传 ' + existingLetters.length + ' 封信件...');
+          const putResponse = await fetch('https://api.jsonbin.io/v3/b/' + BIN_ID, {
             method: 'PUT',
             headers: {
               'Content-Type': 'application/json',
@@ -420,24 +462,34 @@
             body: JSON.stringify(existingLetters)
           });
 
+          console.log('📡 PUT 响应状态:', putResponse.status);
+
+          if (!putResponse.ok) {
+            const putErrText = await putResponse.text();
+            console.error('❌ 上传失败:', putErrText);
+            alert('⚠️ 上传数据失败 (HTTP ' + putResponse.status + ')。请打开浏览器控制台 (F12) 查看详情。');
+            return;
+          }
+
+          console.log('✅ 信件提交成功!');
+
           // 成功页渲染
-          document.getElementById('formBody').innerHTML = `
-            <div class="success-screen">
-              <div class="big-icon">✉️✨</div>
-              <h2 style="color:#2c3a4b; font-family:'楷体',serif;">信已寄出，静候回响</h2>
-              <p style="margin:16px 0; color:#3d3221;">你的心声已抵达国防科大研究生院。</p>
-              <div class="inline-badge">📬 我们将于 <strong>15个工作日</strong> 内回复至 ${email}</div>
-              <p style="margin-top:20px; font-style:italic; color:#a51d1d;">“跨越山海的回信，我在科大等你来。”</p>
-              <p style="margin-top:25px; color:#4a3e2c; line-height:1.8;">感谢您的来信，每一份真挚的倾诉我们都视若珍宝。<br>愿这封信成为您追梦路上的一盏微光，<br>国防科大研究生院，始终与奋斗者同行。</p>
-            </div>
-          `;
+          document.getElementById('formBody').innerHTML =
+            '<div class="success-screen">' +
+            '<div class="big-icon">✉️✨</div>' +
+            '<h2 style="color:#2c3a4b; font-family:\'楷体\',serif;">信已寄出，静候回响</h2>' +
+            '<p style="margin:16px 0; color:#3d3221;">你的心声已抵达国防科大研究生院。</p>' +
+            '<div class="inline-badge">📬 我们将于 <strong>15个工作日</strong> 内回复至 ' + email + '</div>' +
+            '<p style="margin-top:20px; font-style:italic; color:#a51d1d;">"跨越山海的回信，我在科大等你来。"</p>' +
+            '<p style="margin-top:25px; color:#4a3e2c; line-height:1.8;">感谢您的来信，每一份真挚的倾诉我们都视若珍宝。<br>愿这封信成为您追梦路上的一盏微光，<br>国防科大研究生院，始终与奋斗者同行。</p>' +
+            '</div>';
           // 进度条全亮
           Object.values(dots).forEach(d => d.classList.add('active'));
           Object.values(lines).forEach(l => l.classList.add('done'));
 
         } catch (error) {
-          console.error('提交失败：', error);
-          alert('信件投递失败，请检查网络后重试。');
+          console.error('❌ 提交失败：', error);
+          alert('信件投递失败\n\n错误：' + (error.message || '未知错误') + '\n\n请打开浏览器控制台 (F12) 查看更多日志。');
         }
       });
 
