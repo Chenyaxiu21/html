@@ -139,7 +139,61 @@
       font-size: 13px; display: inline-block; margin: 8px 0;
     }
     .hidden { display: none; }
-    /* 卷首语样式 */
+
+    /* 首页炫酷元素 */
+    .screen-home {
+      position: relative;
+      z-index: 2;
+    }
+    /* 科技网格背景 */
+    .bg-grid {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background-image: 
+        linear-gradient(rgba(180,150,100,0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(180,150,100,0.1) 1px, transparent 1px);
+      background-size: 30px 30px;
+      pointer-events: none;
+      z-index: 0;
+    }
+    /* 漂浮国防元素 */
+    .float-element {
+      position: absolute;
+      pointer-events: none;
+      opacity: 0.25;
+      animation: floatAround 6s ease-in-out infinite;
+      font-size: 24px;
+    }
+    @keyframes floatAround {
+      0% { transform: translateY(0px) rotate(0deg); opacity: 0.2; }
+      50% { transform: translateY(-15px) rotate(10deg); opacity: 0.35; }
+      100% { transform: translateY(0px) rotate(0deg); opacity: 0.2; }
+    }
+    /* 信封光环 */
+    .envelope-wrapper {
+      position: relative;
+      width: 80px; height: 80px;
+      margin: 0 auto 10px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .envelope-wrapper::before {
+      content: '';
+      position: absolute;
+      width: 100%; height: 100%;
+      border: 2px dashed #d4af37;
+      border-radius: 50%;
+      animation: spin 10s linear infinite;
+    }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .envelope-wrapper .envelope-icon {
+      font-size: 42px;
+      z-index: 1;
+      position: relative;
+    }
+    /* 卷首语 */
     .preface {
       background: #fef9ed; border: 1px solid #d4b68a; border-radius: 16px;
       padding: 18px 16px; margin: 16px 0; position: relative;
@@ -152,10 +206,24 @@
     }
     .preface p { line-height: 1.8; color: #3e3629; margin-bottom: 10px; text-indent: 2em; }
     .preface .signature { text-align: right; margin-top: 12px; font-style: italic; color: #5c4d36; }
+    .watermark {
+      position: absolute; bottom: 8px; right: 12px;
+      font-size: 16px; color: rgba(165,29,29,0.12); font-weight: bold;
+      letter-spacing: 4px; pointer-events: none;
+    }
     .open-seal-animation {
       cursor: pointer; transition: transform 0.2s;
     }
     .open-seal-animation:active { transform: scale(1.05); }
+    .title-glow {
+      text-align: center; border: none; font-size: 24px;
+      font-weight: 700; color: #2c3a4b; margin: 10px 0 5px;
+      text-shadow: 0 0 5px #d4af37;
+    }
+    .subtitle {
+      text-align: center; color: #5c4d36; font-size: 14px; margin-bottom: 12px;
+      letter-spacing: 2px;
+    }
   </style>
 </head>
 <body>
@@ -174,23 +242,41 @@
       <div class="step-dot" id="dot4">4</div>
     </div>
     <div class="form-body" id="formBody">
-      <!-- 卷首语首页 -->
-      <div class="screen active" id="screen0">
-        <div class="envelope-icon open-seal-animation" id="openSealIcon">✉️🔐</div>
-        <div class="title-serif" style="text-align:center; border:none;">信火相传</div>
-        <p style="text-align:center; color:#4a3e2c; margin:12px 0;">点击下方封印，展开这封写给未来的信。</p>
+      <!-- 首页：炫酷版 -->
+      <div class="screen active screen-home" id="screen0">
+        <!-- 背景网格 -->
+        <div class="bg-grid"></div>
+        <!-- 漂浮国防元素 -->
+        <span class="float-element" style="top:8%;left:5%;animation-delay:0s;font-size:22px;">🛰️</span>
+        <span class="float-element" style="top:18%;right:6%;animation-delay:1.5s;font-size:26px;">🚀</span>
+        <span class="float-element" style="bottom:25%;left:8%;animation-delay:3s;font-size:24px;">📡</span>
+        <span class="float-element" style="top:35%;right:12%;animation-delay:0.8s;font-size:28px;">⚙️</span>
+        <span class="float-element" style="bottom:15%;right:10%;animation-delay:2.2s;font-size:22px;">🎖️</span>
+        <span class="float-element" style="top:10%;right:25%;animation-delay:4s;font-size:20px;">⭐</span>
+        <span class="float-element" style="bottom:10%;left:15%;animation-delay:1.8s;font-size:26px;">📖</span>
+
+        <!-- 主视觉 -->
+        <div class="envelope-wrapper">
+          <div class="envelope-icon open-seal-animation" id="openSealIcon">✉️🔐</div>
+        </div>
+        <div class="title-glow">信火相传</div>
+        <div class="subtitle">厚德博学 · 强军兴国</div>
+        <p style="text-align:center; color:#4a3e2c; margin:12px 0;">点击上方钥匙，开启这封只属于你我的信。</p>
+
+        <!-- 卷首语 -->
         <div class="preface" id="prefaceLetter" style="display:none;">
           <p>亲爱的追梦人：</p>
           <p>当你展开这封信，你已踏入国防科大研究生院的星辰大海。无论你是正在备考的本科生，还是已在科研路上探索的硕士，这里有一群老师和学长学姐，愿意倾听你的困惑，回应你的迷茫。</p>
           <p>写下你的心声，让信火相传，让每一份迷茫都有回响。</p>
           <div class="signature">—— 国防科技大学研究生院招生办公室</div>
         </div>
+
         <div style="text-align:center; margin-top:20px;" id="startBtnContainer" class="hidden">
           <button class="btn primary" id="startLetter">📝 开始书写</button>
         </div>
       </div>
 
-      <!-- 第一步：你是谁（增强版） -->
+      <!-- 第一步：你是谁 -->
       <div class="screen" id="screen1">
         <div class="title-serif">🧑‍🎓 第一步 · 你是谁？</div>
         <label style="font-weight:bold;">姓名</label>
@@ -215,9 +301,9 @@
         <input type="text" id="majorInput" placeholder="例如：计算机科学、航空宇航、电子对抗…">
         <label for="universityInput" style="font-weight:bold;">所在大学</label>
         <input type="text" id="universityInput" placeholder="请输入院校全称，如：国防科技大学" required>
-        <label for="ageInput" style="font-weight:bold;">年龄（选填）</label>
+        <label for="ageInput" style="font-weight:bold;">年龄</label>
         <input type="text" id="ageInput" placeholder="如22">
-        <label style="font-weight:bold;">你从哪里知道我们？（选填）</label>
+        <label style="font-weight:bold;">你从哪里知道我们？</label>
         <div class="radio-group" style="gap:6px;">
           <label class="radio-option"><input type="radio" name="source" value="wechat"> 📱 公众号推文</label>
           <label class="radio-option"><input type="radio" name="source" value="douyin"> 🎵 抖音短视频</label>
@@ -252,10 +338,10 @@
         <div style="margin:20px 0;">
           <div style="display:flex; flex-direction:column; gap:14px;">
             <label class="radio-option" style="margin:0;">
-              <input type="radio" name="replyType" value="A" checked> 📄 A级·电子信（加盖电子邮戳的长图回信）
+              <input type="radio" name="replyType" value="A" checked> 📄 A级·电子信（以字为光，照亮你每个伏案的深夜）
             </label>
             <label class="radio-option" style="margin:0;">
-              <input type="radio" name="replyType" value="S"> 🎧 S级·有声信（回复人亲自朗读）
+              <input type="radio" name="replyType" value="S"> 🎧 S级·有声信（以声为暖，陪伴你每次迷茫的时刻）
             </label>
           </div>
         </div>
@@ -466,9 +552,6 @@
         console.log('📨 信件数据：', letterData);
 
         // ⚠️ 请替换为你自己的 JSONBin.io 凭据
-        // 1. 去 https://jsonbin.io 注册账号
-        // 2. 创建一个 Bin（初始内容设为 [] ）
-        // 3. 复制你的 BIN_ID 和 X-Master-Key 替换下面的值
         const BIN_ID = '69fd580eadc21f119a6cec54';
         const MASTER_KEY = '$2a$10$lViKxa8mlqMOUQ5u0jAxIetNJPAAYIsFbAU2r7eAwmMLFAKJ4844W';
 
