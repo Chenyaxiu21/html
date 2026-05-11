@@ -46,11 +46,22 @@
       display: flex; align-items: center; justify-content: space-between;
       color: #f7eac7; font-weight: bold; letter-spacing: 1.5px;
       text-shadow: 1px 1px 0 #3a0f0f;
+      animation: glowText 2s ease-in-out infinite alternate;
+    }
+    @keyframes glowText {
+      from { text-shadow: 1px 1px 0 #3a0f0f; }
+      to { text-shadow: 0 0 8px #ffd966, 1px 1px 0 #3a0f0f; }
     }
     .seal-text { font-size: 18px; display: flex; align-items: center; gap: 5px; }
     .seal-badge {
       background: #eec643; color: #1e2f4a; padding: 3px 14px; border-radius: 20px;
       font-size: 13px; font-weight: bold; background: #f3cd60; box-shadow: 0 0 10px #ffd966;
+      animation: badgePulse 2s ease-in-out infinite;
+    }
+    @keyframes badgePulse {
+      0% { box-shadow: 0 0 5px #ffd966; }
+      50% { box-shadow: 0 0 15px #ffd966, 0 0 20px #e0b040; }
+      100% { box-shadow: 0 0 5px #ffd966; }
     }
     .progress-area {
       display: flex; align-items: center; justify-content: center;
@@ -128,6 +139,23 @@
       font-size: 13px; display: inline-block; margin: 8px 0;
     }
     .hidden { display: none; }
+    /* 卷首语样式 */
+    .preface {
+      background: #fef9ed; border: 1px solid #d4b68a; border-radius: 16px;
+      padding: 18px 16px; margin: 16px 0; position: relative;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .preface::before {
+      content: "“";
+      font-size: 48px; color: #a51d1d; opacity: 0.25;
+      position: absolute; top: -10px; left: 10px; font-family: serif;
+    }
+    .preface p { line-height: 1.8; color: #3e3629; margin-bottom: 10px; text-indent: 2em; }
+    .preface .signature { text-align: right; margin-top: 12px; font-style: italic; color: #5c4d36; }
+    .open-seal-animation {
+      cursor: pointer; transition: transform 0.2s;
+    }
+    .open-seal-animation:active { transform: scale(1.05); }
   </style>
 </head>
 <body>
@@ -146,31 +174,49 @@
       <div class="step-dot" id="dot4">4</div>
     </div>
     <div class="form-body" id="formBody">
+      <!-- 卷首语首页 -->
       <div class="screen active" id="screen0">
-        <div class="envelope-icon">✉️🔐</div>
+        <div class="envelope-icon open-seal-animation" id="openSealIcon">✉️🔐</div>
         <div class="title-serif" style="text-align:center; border:none;">信火相传</div>
-        <p style="text-align:center; color:#4a3e2c; margin:12px 0;">一封来自心底的信，即将跨越山海。</p>
-        <div style="text-align:center; margin-top:30px;">
+        <p style="text-align:center; color:#4a3e2c; margin:12px 0;">点击下方封印，展开这封写给未来的信。</p>
+        <div class="preface" id="prefaceLetter" style="display:none;">
+          <p>亲爱的追梦人：</p>
+          <p>当你展开这封信，你已踏入国防科大研究生院的星辰大海。无论你是正在备考的本科生，还是已在科研路上探索的硕士，这里有一群老师和学长学姐，愿意倾听你的困惑，回应你的迷茫。</p>
+          <p>写下你的心声，让信火相传，让每一份迷茫都有回响。</p>
+          <div class="signature">—— 国防科技大学研究生院招生办公室</div>
+        </div>
+        <div style="text-align:center; margin-top:20px;" id="startBtnContainer" class="hidden">
           <button class="btn primary" id="startLetter">📝 开始书写</button>
         </div>
       </div>
 
+      <!-- 第一步：你是谁（增强版） -->
       <div class="screen" id="screen1">
         <div class="title-serif">🧑‍🎓 第一步 · 你是谁？</div>
+        <label style="font-weight:bold;">姓名</label>
+        <input type="text" id="nicknameInput" placeholder="真实姓名">
         <label style="font-weight:bold;">身份</label>
         <div class="radio-group" id="identityGroup">
           <label class="radio-option"><input type="radio" name="identity" value="student" checked> 🎓 在校学生</label>
-          <label class="radio-option"><input type="radio" name="identity" value="parent"> 👨‍👩‍👧 家长</label>
+          <label class="radio-option"><input type="radio" name="identity" value="parent"> 👨‍👩‍👧 学生家长</label>
           <label class="radio-option"><input type="radio" name="identity" value="other"> 🧑‍🏫 其他</label>
         </div>
         <div id="otherIdentityContainer" class="hidden">
           <label for="otherIdentityInput" style="font-weight:bold;">请填写具体身份</label>
           <input type="text" id="otherIdentityInput" placeholder="例如：高中教师、科研工作者…">
         </div>
-        <label for="ageInput" style="font-weight:bold;">年龄</label>
-        <input type="text" id="ageInput" placeholder="请输入年龄（如22）">
-        <label for="universityInput" style="font-weight:bold;">所在大学（必填）</label>
+        <label style="font-weight:bold;">学历状态</label>
+        <div class="radio-group" id="degreeGroup">
+          <label class="radio-option"><input type="radio" name="degreeStatus" value="undergraduate" checked> 📘 本科在读</label>
+          <label class="radio-option"><input type="radio" name="degreeStatus" value="master"> 📙 硕士在读</label>
+          <label class="radio-option"><input type="radio" name="degreeStatus" value="graduated"> 🎓 已毕业</label>
+        </div>
+        <label for="majorInput" style="font-weight:bold;">专业</label>
+        <input type="text" id="majorInput" placeholder="例如：计算机科学、航空宇航、电子对抗…">
+        <label for="universityInput" style="font-weight:bold;">所在大学</label>
         <input type="text" id="universityInput" placeholder="请输入院校全称，如：国防科技大学" required>
+        <label for="ageInput" style="font-weight:bold;">年龄（选填）</label>
+        <input type="text" id="ageInput" placeholder="如22">
         <label style="font-weight:bold;">你从哪里知道我们？（选填）</label>
         <div class="radio-group" style="gap:6px;">
           <label class="radio-option"><input type="radio" name="source" value="wechat"> 📱 公众号推文</label>
@@ -209,7 +255,7 @@
               <input type="radio" name="replyType" value="A" checked> 📄 A级·电子信（加盖电子邮戳的长图回信）
             </label>
             <label class="radio-option" style="margin:0;">
-              <input type="radio" name="replyType" value="S"> 🎧 S级·有声信（回复人亲自朗读，配背景音乐）
+              <input type="radio" name="replyType" value="S"> 🎧 S级·有声信（回复人亲自朗读）
             </label>
           </div>
         </div>
@@ -301,6 +347,21 @@
         if (seniorRadio) seniorRadio.checked = true;
       }
 
+      // 卷首语交互：点击信封图标展开
+      const openSealIcon = document.getElementById('openSealIcon');
+      const prefaceLetter = document.getElementById('prefaceLetter');
+      const startBtnContainer = document.getElementById('startBtnContainer');
+      let sealOpened = false;
+
+      openSealIcon.addEventListener('click', function() {
+        if (sealOpened) return;
+        sealOpened = true;
+        openSealIcon.innerHTML = '✉️✨';
+        openSealIcon.style.animation = 'fadeIn 0.5s ease';
+        prefaceLetter.style.display = 'block';
+        startBtnContainer.classList.remove('hidden');
+      });
+
       // 其他身份输入框
       const identityRadios = document.querySelectorAll('input[name="identity"]');
       const otherContainer = document.getElementById('otherIdentityContainer');
@@ -328,7 +389,7 @@
           alert('请填写具体身份'); return;
         }
         const university = document.getElementById('universityInput').value.trim();
-        if (!university) { alert('请填写所在大学'); return; }
+        if (!university) { alert('请填写所在大学/毕业院校'); return; }
         showScreen(2);
       });
       document.getElementById('backTo1').addEventListener('click', () => showScreen(1));
@@ -341,8 +402,8 @@
       const quadrantGuides = {
         policy: '我想了解具体的报考政策、体检标准、专业选择等问题。',
         research: '我正在做某方向的课题，感到迷茫，请问科大的学长是如何度过科研瓶颈期的？',
-        life: '我想知道军校生的一天是怎么过的？除了科研，能打球、弹吉他吗？',
-        dream: '我梦想设计战斗机/攻克超算难题，离这个梦想还有多远？'
+        life: '我想知道军校生的一天是怎么过的？',
+        dream: '我梦想研究北斗系统/攻克超算难题，离这个梦想还有多远？'
       };
       document.querySelectorAll('.quadrant-card').forEach(card => {
         card.addEventListener('click', function() {
@@ -368,9 +429,13 @@
           return;
         }
 
+        const nickname = document.getElementById('nicknameInput').value.trim();
         const identityRadio = document.querySelector('input[name="identity"]:checked');
         const identity = identityRadio ? identityRadio.value : '';
         const otherIdentity = (identity === 'other') ? otherInput.value.trim() : '';
+        const degreeRadio = document.querySelector('input[name="degreeStatus"]:checked');
+        const degreeStatus = degreeRadio ? degreeRadio.value : '';
+        const major = document.getElementById('majorInput').value.trim();
         const age = document.getElementById('ageInput').value.trim();
         const university = document.getElementById('universityInput').value.trim();
         const sourceRadio = document.querySelector('input[name="source"]:checked');
@@ -381,9 +446,12 @@
 
         const letterData = {
           id: Date.now().toString(36) + Math.random().toString(36).substr(2, 6),
+          nickname: nickname || null,
           identity,
           otherIdentity: otherIdentity || null,
-          age,
+          degreeStatus: degreeStatus || null,
+          major: major || null,
+          age: age || null,
           university,
           source,
           referee: referee || null,
@@ -407,8 +475,6 @@
         console.log('🔄 开始提交到 JSONBin...');
 
         try {
-          // 第1步：先测试 JSONBin API 是否可达
-          console.log('📡 正在连接 JSONBin API...');
           const testUrl = 'https://api.jsonbin.io/v3/b/' + BIN_ID + '/latest';
 
           let getResponse;
@@ -418,7 +484,6 @@
             });
           } catch (netErr) {
             console.error('❌ 网络请求失败:', netErr);
-            // 检查是否是 CORS 或 file:// 协议问题
             if (window.location.protocol === 'file:') {
               alert('⚠️ 当前通过 file:// 协议打开，浏览器禁止跨域请求。\n\n请通过本地服务器打开此页面（如使用 Live Server 插件，或部署到服务器上访问）。');
             } else if (netErr.message && netErr.message.includes('NetworkError')) {
@@ -428,8 +493,6 @@
             }
             return;
           }
-
-          console.log('📡 GET 响应状态:', getResponse.status);
 
           if (!getResponse.ok) {
             const errText = await getResponse.text();
@@ -445,14 +508,9 @@
           }
 
           const getData = await getResponse.json();
-          console.log('📦 获取到的数据:', getData);
-
-          // 第2步：确保 record 是数组
           const existingLetters = Array.isArray(getData.record) ? getData.record : [];
           existingLetters.push(letterData);
 
-          // 第3步：写回数据
-          console.log('📤 正在上传 ' + existingLetters.length + ' 封信件...');
           const putResponse = await fetch('https://api.jsonbin.io/v3/b/' + BIN_ID, {
             method: 'PUT',
             headers: {
@@ -461,8 +519,6 @@
             },
             body: JSON.stringify(existingLetters)
           });
-
-          console.log('📡 PUT 响应状态:', putResponse.status);
 
           if (!putResponse.ok) {
             const putErrText = await putResponse.text();
@@ -483,7 +539,6 @@
             '<p style="margin-top:20px; font-style:italic; color:#a51d1d;">"跨越山海的回信，我在科大等你来。"</p>' +
             '<p style="margin-top:25px; color:#4a3e2c; line-height:1.8;">感谢您的来信，每一份真挚的倾诉我们都视若珍宝。<br>愿这封信成为您追梦路上的一盏微光，<br>国防科大研究生院，始终与奋斗者同行。</p>' +
             '</div>';
-          // 进度条全亮
           Object.values(dots).forEach(d => d.classList.add('active'));
           Object.values(lines).forEach(l => l.classList.add('done'));
 
