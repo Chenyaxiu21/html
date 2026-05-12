@@ -119,7 +119,7 @@
       padding: 12px 10px; text-align: center; font-size: 13px; cursor: pointer; transition: 0.2s;
       color: #3e3629; font-weight: 500; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     }
-    .quadrant-card:active { background: #f3e3c9; border-color: #a51d1d; }
+    .quadrant-card:active { background: #f3e3c9; border-color: #a51d1d; transform: scale(0.97); }
     .quadrant-icon { font-size: 24px; display: block; margin-bottom: 4px; }
     .nav-buttons { display: flex; justify-content: space-between; margin-top: 20px; }
     .btn {
@@ -130,8 +130,8 @@
     }
     .btn.primary { background: #a51d1d; border-bottom: 3px solid #f3cd60; }
     .btn:active { transform: scale(0.97); }
-    .envelope-icon { text-align: center; font-size: 42px; margin: 8px 0; }
-    .small-note { font-size: 12px; color: #6b5e4b; margin-top: 6px; }
+    .envelope-icon { font-size: 42px; margin: 8px 0; }
+    .small-note { font-size: 12px; color: #6b5e4b; margin-top: 6px; text-align: center; }
     .success-screen { text-align: center; padding: 20px; }
     .success-screen .big-icon { font-size: 64px; margin-bottom: 15px; }
     .inline-badge {
@@ -140,80 +140,57 @@
     }
     .hidden { display: none; }
 
-    /* 首页炫酷元素 */
-    .screen-home {
-      position: relative;
-      z-index: 2;
+    /* 国防科大装饰元素 */
+    .watermark {
+      position: absolute; bottom: 8px; right: 12px;
+      font-size: 14px; color: rgba(165,29,29,0.1); font-weight: bold;
+      letter-spacing: 4px; pointer-events: none; z-index: 1;
     }
-    /* 科技网格背景 */
+    .screen-home {
+      position: relative; z-index: 2;
+    }
     .bg-grid {
-      position: absolute;
-      top: 0; left: 0; width: 100%; height: 100%;
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
       background-image: 
         linear-gradient(rgba(180,150,100,0.1) 1px, transparent 1px),
         linear-gradient(90deg, rgba(180,150,100,0.1) 1px, transparent 1px);
-      background-size: 30px 30px;
-      pointer-events: none;
-      z-index: 0;
+      background-size: 30px 30px; pointer-events: none; z-index: 0;
     }
-    /* 漂浮国防元素 */
     .float-element {
-      position: absolute;
-      pointer-events: none;
-      opacity: 0.25;
-      animation: floatAround 6s ease-in-out infinite;
-      font-size: 24px;
+      position: absolute; pointer-events: none; opacity: 0.25;
+      animation: floatAround 6s ease-in-out infinite; font-size: 24px;
     }
     @keyframes floatAround {
       0% { transform: translateY(0px) rotate(0deg); opacity: 0.2; }
       50% { transform: translateY(-15px) rotate(10deg); opacity: 0.35; }
       100% { transform: translateY(0px) rotate(0deg); opacity: 0.2; }
     }
-    /* 信封光环 */
     .envelope-wrapper {
-      position: relative;
-      width: 80px; height: 80px;
-      margin: 0 auto 10px;
-      display: flex; align-items: center; justify-content: center;
+      position: relative; width: 80px; height: 80px;
+      margin: 0 auto 10px; display: flex; align-items: center; justify-content: center;
     }
     .envelope-wrapper::before {
-      content: '';
-      position: absolute;
-      width: 100%; height: 100%;
-      border: 2px dashed #d4af37;
-      border-radius: 50%;
+      content: ''; position: absolute; width: 100%; height: 100%;
+      border: 2px dashed #d4af37; border-radius: 50%;
       animation: spin 10s linear infinite;
     }
     @keyframes spin {
       from { transform: rotate(0deg); }
       to { transform: rotate(360deg); }
     }
-    .envelope-wrapper .envelope-icon {
-      font-size: 42px;
-      z-index: 1;
-      position: relative;
-    }
-    /* 卷首语 */
+    .envelope-wrapper .envelope-icon { font-size: 42px; z-index: 1; position: relative; }
     .preface {
       background: #fef9ed; border: 1px solid #d4b68a; border-radius: 16px;
       padding: 18px 16px; margin: 16px 0; position: relative;
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
     .preface::before {
-      content: "“";
-      font-size: 48px; color: #a51d1d; opacity: 0.25;
+      content: "“"; font-size: 48px; color: #a51d1d; opacity: 0.25;
       position: absolute; top: -10px; left: 10px; font-family: serif;
     }
     .preface p { line-height: 1.8; color: #3e3629; margin-bottom: 10px; text-indent: 2em; }
     .preface .signature { text-align: right; margin-top: 12px; font-style: italic; color: #5c4d36; }
-    .watermark {
-      position: absolute; bottom: 8px; right: 12px;
-      font-size: 16px; color: rgba(165,29,29,0.12); font-weight: bold;
-      letter-spacing: 4px; pointer-events: none;
-    }
-    .open-seal-animation {
-      cursor: pointer; transition: transform 0.2s;
-    }
+    .open-seal-animation { cursor: pointer; transition: transform 0.2s; }
     .open-seal-animation:active { transform: scale(1.05); }
     .title-glow {
       text-align: center; border: none; font-size: 24px;
@@ -223,6 +200,31 @@
     .subtitle {
       text-align: center; color: #5c4d36; font-size: 14px; margin-bottom: 12px;
       letter-spacing: 2px;
+    }
+
+    /* 上传区域样式 */
+    .upload-area {
+      margin: 15px 0;
+      background: #fffcf2;
+      border: 1px dashed #b49460;
+      border-radius: 14px;
+      padding: 12px;
+      text-align: center;
+    }
+    .upload-area label {
+      display: block;
+      cursor: pointer;
+      color: #4a3e2c;
+      font-size: 14px;
+      margin-bottom: 6px;
+    }
+    .upload-area input[type="file"] {
+      display: none;
+    }
+    .file-name {
+      font-size: 13px;
+      color: #a51d1d;
+      margin-top: 4px;
     }
   </style>
 </head>
@@ -244,9 +246,7 @@
     <div class="form-body" id="formBody">
       <!-- 首页：炫酷版 -->
       <div class="screen active screen-home" id="screen0">
-        <!-- 背景网格 -->
         <div class="bg-grid"></div>
-        <!-- 漂浮国防元素 -->
         <span class="float-element" style="top:8%;left:5%;animation-delay:0s;font-size:22px;">🛰️</span>
         <span class="float-element" style="top:18%;right:6%;animation-delay:1.5s;font-size:26px;">🚀</span>
         <span class="float-element" style="bottom:25%;left:8%;animation-delay:3s;font-size:24px;">📡</span>
@@ -255,15 +255,13 @@
         <span class="float-element" style="top:10%;right:25%;animation-delay:4s;font-size:20px;">⭐</span>
         <span class="float-element" style="bottom:10%;left:15%;animation-delay:1.8s;font-size:26px;">📖</span>
 
-        <!-- 主视觉 -->
         <div class="envelope-wrapper">
           <div class="envelope-icon open-seal-animation" id="openSealIcon">✉️🔐</div>
         </div>
         <div class="title-glow">信火相传</div>
         <div class="subtitle">厚德博学 · 强军兴国</div>
-        <p style="text-align:center; color:#4a3e2c; margin:12px 0;">点击上方钥匙，开启这封只属于你我的信。</p>
+        <p style="text-align:center; color:#4a3e2c; margin:12px 0;">点击上方钥匙，开启这封只属于你的信。</p>
 
-        <!-- 卷首语 -->
         <div class="preface" id="prefaceLetter" style="display:none;">
           <p>亲爱的追梦人：</p>
           <p>当你展开这封信，你已踏入国防科大研究生院的星辰大海。无论你是正在备考的本科生，还是已在科研路上探索的硕士，这里有一群老师和学长学姐，愿意倾听你的困惑，回应你的迷茫。</p>
@@ -274,6 +272,7 @@
         <div style="text-align:center; margin-top:20px;" id="startBtnContainer" class="hidden">
           <button class="btn primary" id="startLetter">📝 开始书写</button>
         </div>
+        <div class="watermark">国防科技大学</div>
       </div>
 
       <!-- 第一步：你是谁 -->
@@ -293,9 +292,8 @@
         </div>
         <label style="font-weight:bold;">学历状态</label>
         <div class="radio-group" id="degreeGroup">
-          <label class="radio-option"><input type="radio" name="degreeStatus" value="undergraduate" checked> 📗 本科在读</label>
-          <label class="radio-option"><input type="radio" name="degreeStatus" value="master"> 📘 硕士在读</label>
-          <label class="radio-option"><input type="radio" name="degreeStatus" value="master"> 📙 博士在读</label>
+          <label class="radio-option"><input type="radio" name="degreeStatus" value="undergraduate" checked> 📘 本科在读</label>
+          <label class="radio-option"><input type="radio" name="degreeStatus" value="master"> 📙 硕士在读</label>
           <label class="radio-option"><input type="radio" name="degreeStatus" value="graduated"> 🎓 已毕业</label>
         </div>
         <label for="majorInput" style="font-weight:bold;">专业</label>
@@ -316,6 +314,7 @@
           <button class="btn" id="backTo0">← 返回</button>
           <button class="btn primary" id="toScreen2">下一步 · 书写心语</button>
         </div>
+        <div class="watermark">国防科技大学</div>
       </div>
 
       <div class="screen" id="screen2">
@@ -332,6 +331,7 @@
           <button class="btn" id="backTo1">← 返回</button>
           <button class="btn primary" id="toScreen3">下一步 · 回信形式</button>
         </div>
+        <div class="watermark">国防科技大学</div>
       </div>
 
       <div class="screen" id="screen3">
@@ -339,10 +339,10 @@
         <div style="margin:20px 0;">
           <div style="display:flex; flex-direction:column; gap:14px;">
             <label class="radio-option" style="margin:0;">
-              <input type="radio" name="replyType" value="A" checked> 📄 A级·电子信（以字为光，照亮你每个伏案的深夜）
+              <input type="radio" name="replyType" value="A" checked> 📄 A级·电子信（一封长信，字里行间藏着科大的温柔）
             </label>
             <label class="radio-option" style="margin:0;">
-              <input type="radio" name="replyType" value="S"> 🎧 S级·有声信（以声为暖，陪伴你每次迷茫的时刻）
+              <input type="radio" name="replyType" value="S"> 🎧 S级·有声信（一段声波，耳机里传来真挚的回响）
             </label>
           </div>
         </div>
@@ -350,20 +350,37 @@
           <button class="btn" id="backTo2">← 返回</button>
           <button class="btn primary" id="toScreen4">最后一步 · 接收方式</button>
         </div>
+        <div class="watermark">国防科技大学</div>
       </div>
 
       <div class="screen" id="screen4">
         <div class="title-serif">📬 最后一步 · 回信寄往哪里？</div>
         <label>📧 邮箱（必填，回信唯一通道）</label>
         <input type="email" id="emailInput" placeholder="yourname@example.com" required>
-        <div class="checkbox-item" style="margin-top:15px;">
-          <input type="checkbox" id="privacyConsent"> 🔒 我已阅读并同意<span style="color:#a51d1d;">隐私保护条款</span>（信件仅回信人可见）
+
+        <!-- 新增附件上传区域 -->
+        <label style="margin-top:15px; font-weight:bold;">📎 上传简历（选填，以便我们更好地了解你）</label>
+        <div class="upload-area">
+          <label for="resumeInput">
+            <span style="font-size:24px;">📄</span><br>
+            点击此处选择文件<br>
+            <span style="font-size:12px; color:#8b6f4c;">支持 PDF、JPG、PNG，不超过 2MB</span>
+          </label>
+          <input type="file" id="resumeInput" accept=".pdf,.jpg,.jpeg,.png">
+          <div class="file-name" id="fileNameDisplay"></div>
         </div>
+
+        <div class="checkbox-item" style="margin-top:15px;">
+          <input type="checkbox" id="privacyConsent"> 🔒 我已阅读并同意<span style="color:#a51d1d;">隐私保护条款</span>（信件及简历仅回信人可见）
+        </div>
+        <p class="small-note" style="text-align:left; color:#8b6f4c;">你的简历与信件同样会被严格保密，仅用于招生咨询回复。</p>
+
         <div class="nav-buttons">
           <button class="btn" id="backTo3">← 返回</button>
           <button class="btn primary" id="submitLetter">📮 投递心语</button>
         </div>
-        <p class="small-note" style="text-align:center;">⏳ 承诺15个工作日内回信</p>
+        <p class="small-note">⏳ 承诺15个工作日内回信</p>
+        <div class="watermark">国防科技大学</div>
       </div>
     </div>
   </div>
@@ -434,7 +451,7 @@
         if (seniorRadio) seniorRadio.checked = true;
       }
 
-      // 卷首语交互：点击信封图标展开
+      // 卷首语交互
       const openSealIcon = document.getElementById('openSealIcon');
       const prefaceLetter = document.getElementById('prefaceLetter');
       const startBtnContainer = document.getElementById('startBtnContainer');
@@ -465,6 +482,24 @@
       }
       identityRadios.forEach(radio => radio.addEventListener('change', toggleOtherIdentity));
       toggleOtherIdentity();
+
+      // 文件上传展示
+      const resumeInput = document.getElementById('resumeInput');
+      const fileNameDisplay = document.getElementById('fileNameDisplay');
+      resumeInput.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+          const file = this.files[0];
+          if (file.size > 2 * 1024 * 1024) {
+            alert('文件大小不能超过2MB，请重新选择。');
+            this.value = '';
+            fileNameDisplay.textContent = '';
+            return;
+          }
+          fileNameDisplay.textContent = '已选择：' + file.name + ' (' + (file.size/1024).toFixed(1) + ' KB)';
+        } else {
+          fileNameDisplay.textContent = '';
+        }
+      });
 
       // 按钮事件
       document.getElementById('startLetter').addEventListener('click', () => showScreen(1));
@@ -504,6 +539,16 @@
         });
       });
 
+      // 文件转base64
+      function fileToBase64(file) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+      }
+
       // 提交信件
       document.getElementById('submitLetter').addEventListener('click', async function() {
         const email = document.getElementById('emailInput').value.trim();
@@ -531,6 +576,24 @@
         const replyTypeRadio = document.querySelector('input[name="replyType"]:checked');
         const replyType = replyTypeRadio ? replyTypeRadio.value : 'A';
 
+        // 处理简历附件
+        let resumeBase64 = null;
+        let resumeFileName = null;
+        if (resumeInput.files && resumeInput.files[0]) {
+          const file = resumeInput.files[0];
+          if (file.size > 2 * 1024 * 1024) {
+            alert('简历文件不能超过2MB，请压缩后重新上传。');
+            return;
+          }
+          try {
+            resumeBase64 = await fileToBase64(file);
+            resumeFileName = file.name;
+          } catch (err) {
+            alert('简历读取失败，请重试。');
+            return;
+          }
+        }
+
         const letterData = {
           id: Date.now().toString(36) + Math.random().toString(36).substr(2, 6),
           nickname: nickname || null,
@@ -545,6 +608,7 @@
           message,
           replyType,
           email,
+          resumeFile: resumeBase64 ? { name: resumeFileName, data: resumeBase64 } : null,
           replied: false,
           timestamp: new Date().toISOString(),
           campaign: '信火相传'
@@ -621,7 +685,8 @@
             '<p style="margin:16px 0; color:#3d3221;">你的心声已抵达国防科大研究生院。</p>' +
             '<div class="inline-badge">📬 我们将于 <strong>15个工作日</strong> 内回复至 ' + email + '</div>' +
             '<p style="margin-top:20px; font-style:italic; color:#a51d1d;">"跨越山海的回信，我在科大等你来。"</p>' +
-            '<p style="margin-top:25px; color:#4a3e2c; line-height:1.8;">感谢您的来信，每一份真挚的倾诉我们都视若珍宝。<br>愿这封信成为您追梦路上的一盏微光，<br>国防科大研究生院，始终与奋斗者同行。</p>' +
+            '<p style="margin-top:25px; color:#4a3e2c; line-height:1.8;">感谢你的来信与信任，每一份真挚的倾诉我们都视若珍宝。<br>愿这封信成为你追梦路上的一盏微光，<br>厚德博学，强军兴国，我们并肩前行。</p>' +
+            '<div style="margin-top:15px; font-size:24px; animation: spin 3s linear infinite;">⭐</div>' +
             '</div>';
           Object.values(dots).forEach(d => d.classList.add('active'));
           Object.values(lines).forEach(l => l.classList.add('done'));
