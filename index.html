@@ -279,7 +279,7 @@
       <div class="screen" id="screen1">
         <div class="title-serif">🧑‍🎓 第一步 · 你是谁？</div>
         <label style="font-weight:bold;">姓名</label>
-        <input type="text" id="nicknameInput" placeholder="真实姓名">
+        <input type="text" id="nicknameInput" placeholder="真实姓名" required>
         <label style="font-weight:bold;">身份</label>
         <div class="radio-group" id="identityGroup">
           <label class="radio-option"><input type="radio" name="identity" value="student" checked> 🎓 在校学生</label>
@@ -297,11 +297,11 @@
           <label class="radio-option"><input type="radio" name="degreeStatus" value="graduated"> 🎓 已毕业</label>
         </div>
         <label for="majorInput" style="font-weight:bold;">专业</label>
-        <input type="text" id="majorInput" placeholder="例如：计算机科学、航空宇航、电子对抗…">
+        <input type="text" id="majorInput" placeholder="例如：计算机科学、航空宇航、电子对抗…" required>
         <label for="universityInput" style="font-weight:bold;">所在大学</label>
         <input type="text" id="universityInput" placeholder="请输入院校全称，如：国防科技大学" required>
         <label for="ageInput" style="font-weight:bold;">年龄</label>
-        <input type="text" id="ageInput" placeholder="如22">
+        <input type="text" id="ageInput" placeholder="如22" required>
         <label style="font-weight:bold;">你从哪里知道我们？</label>
         <div class="radio-group" style="gap:6px;">
           <label class="radio-option"><input type="radio" name="source" value="wechat"> 📱 公众号推文</label>
@@ -359,7 +359,7 @@
         <input type="email" id="emailInput" placeholder="yourname@example.com" required>
 
         <!-- 新增附件上传区域 -->
-        <label style="margin-top:15px; font-weight:bold;">📎 上传简历（选填，以便我们更好地了解你）</label>
+        <label style="margin-top:15px; font-weight:bold;">📎 上传简历（选填）</label>
         <div class="upload-area">
           <label for="resumeInput">
             <span style="font-size:24px;">📄</span><br>
