@@ -23,20 +23,24 @@
     .filter-group label { font-size: 13px; color: #4b5563; font-weight: 500; }
     .filter-group select, .filter-group input { padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; }
     .table-container { background: #fff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; }
-    th { background: #f9fafb; padding: 12px 16px; text-align: left; font-weight: 600; color: #374151; font-size: 14px; border-bottom: 1px solid #e5e7eb; white-space: nowrap; }
-    td { padding: 14px 16px; border-bottom: 1px solid #f3f4f6; font-size: 14px; color: #1f2937; }
-    .identity-tag { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 12px; background: #e0e7ff; color: #3730a3; }
-    .reply-badge { background: #fef3c7; color: #92400e; padding: 2px 8px; border-radius: 12px; font-size: 12px; }
+    table { width: 100%; border-collapse: collapse; min-width: 1200px; }
+    th { background: #f9fafb; padding: 12px 10px; text-align: left; font-weight: 600; color: #374151; font-size: 13px; border-bottom: 1px solid #e5e7eb; white-space: nowrap; }
+    td { padding: 12px 10px; border-bottom: 1px solid #f3f4f6; font-size: 13px; color: #1f2937; }
+    .identity-tag { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 11px; background: #e0e7ff; color: #3730a3; white-space: nowrap; }
+    .degree-tag { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 11px; background: #fce7f3; color: #9d174d; white-space: nowrap; }
+    .reply-badge { background: #fef3c7; color: #92400e; padding: 2px 8px; border-radius: 12px; font-size: 11px; white-space: nowrap; }
     .replied { background: #d1fae5; color: #065f46; }
-    .msg-preview { max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; color: #2563eb; text-decoration: underline; }
-    .btn { padding: 6px 12px; border: none; border-radius: 8px; cursor: pointer; font-size: 13px; }
+    .msg-preview { max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; color: #2563eb; text-decoration: underline; }
+    .btn { padding: 6px 12px; border: none; border-radius: 8px; cursor: pointer; font-size: 12px; white-space: nowrap; }
     .btn-reply { background: #1e3b5a; color: #fff; }
     .btn-reply:disabled { background: #9ca3af; }
     .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
-    .modal-content { background: #fff; border-radius: 16px; padding: 24px; width: 90%; max-width: 560px; max-height: 80vh; overflow-y: auto; position: relative; }
+    .modal-content { background: #fff; border-radius: 16px; padding: 24px; width: 90%; max-width: 600px; max-height: 80vh; overflow-y: auto; position: relative; }
     .close { position: absolute; top: 12px; right: 16px; font-size: 24px; cursor: pointer; color: #6b7280; }
     .empty { text-align: center; padding: 48px; color: #9ca3af; }
+    .download-link { color: #2563eb; text-decoration: underline; cursor: pointer; }
+    .detail-row { margin-bottom: 10px; line-height: 1.6; }
+    .detail-row strong { display: inline-block; width: 90px; color: #374151; }
   </style>
 </head>
 <body>
@@ -70,8 +74,17 @@
         </select>
       </div>
       <div class="filter-group">
-        <label>大学</label>
-        <input type="text" id="filterUniversity" placeholder="输入院校搜索...">
+        <label>学历状态</label>
+        <select id="filterDegree">
+          <option value="">全部</option>
+          <option value="undergraduate">本科在读</option>
+          <option value="master">硕士在读</option>
+          <option value="graduated">已毕业</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>专业 / 大学</label>
+        <input type="text" id="filterKeyword" placeholder="搜索专业或院校...">
       </div>
       <div class="filter-group">
         <label>回信形式</label>
@@ -79,6 +92,16 @@
           <option value="">全部</option>
           <option value="A">A级·电子信</option>
           <option value="S">S级·有声信</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>来源</label>
+        <select id="filterSource">
+          <option value="">全部</option>
+          <option value="wechat">公众号推文</option>
+          <option value="douyin">抖音短视频</option>
+          <option value="senior">学长/老师推荐</option>
+          <option value="other_source">其他</option>
         </select>
       </div>
       <div class="filter-group">
@@ -94,11 +117,15 @@
       <table>
         <thead>
           <tr>
+            <th>姓名</th>
             <th>身份</th>
-            <th>年龄</th>
+            <th>学历</th>
+            <th>专业</th>
             <th>所在大学</th>
             <th>心声摘要</th>
+            <th>附件</th>
             <th>回信形式</th>
+            <th>来源</th>
             <th>邮箱</th>
             <th>时间</th>
             <th>状态</th>
@@ -115,17 +142,16 @@
   <div class="modal" id="detailModal">
     <div class="modal-content">
       <span class="close" id="closeModal">&times;</span>
-      <h3>信件详情</h3>
+      <h3>📨 信件详情</h3>
       <div id="modalContent" style="margin-top:16px;"></div>
     </div>
   </div>
 
   <script>
-    // ===== 请替换成你的 JSONBin 信息（和 index.html 里的一样） =====
+    // ===== 请替换成你自己的 JSONBin 凭据 =====
     const BIN_ID = '69fd580eadc21f119a6cec54';
     const MASTER_KEY = '$2a$10$lViKxa8mlqMOUQ5u0jAxIetNJPAAYIsFbAU2r7eAwmMLFAKJ4844W';
 
-    // ===== 数据读取 =====
     async function getLetters() {
       try {
         const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
@@ -162,20 +188,57 @@
     function formatDate(iso) {
       if (!iso) return '';
       const d = new Date(iso);
-      return `${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;
+      return `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
     }
 
     function getIdentityLabel(val, other) {
       if (val === 'student') return '在校学生';
       if (val === 'parent') return '家长';
       if (val === 'other') return other || '其他';
-      return val;
+      return val || '未知';
     }
 
-    // 当前数据缓存
+    function getDegreeLabel(val) {
+      if (val === 'undergraduate') return '本科在读';
+      if (val === 'master') return '硕士在读';
+      if (val === 'graduated') return '已毕业';
+      return val || '—';
+    }
+
+    function getSourceLabel(val) {
+      const map = {
+        'wechat': '公众号推文',
+        'douyin': '抖音短视频',
+        'senior': '学长/老师推荐',
+        'other_source': '其他'
+      };
+      return map[val] || val || '—';
+    }
+
+    function downloadBase64File(dataUrl, fileName) {
+      if (!dataUrl) return;
+      const arr = dataUrl.split(',');
+      if (arr.length < 2) return;
+      const mime = arr[0].match(/:(.*?);/)?.[1] || 'application/octet-stream';
+      const bstr = atob(arr[1]);
+      let n = bstr.length;
+      const u8arr = new Uint8Array(n);
+      while (n--) {
+        u8arr[n] = bstr.charCodeAt(n);
+      }
+      const blob = new Blob([u8arr], { type: mime });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName || 'resume';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
     let allLetters = [];
 
-    // 渲染表格
     function render(letters) {
       const tbody = document.getElementById('tableBody');
       const emptyHint = document.getElementById('emptyHint');
@@ -185,16 +248,20 @@
       } else {
         emptyHint.style.display = 'none';
         tbody.innerHTML = letters.map((l) => {
-          // 优先使用 id，如果没有则用 email+timestamp 作为后备
           const key = l.id || `${l.email}||${l.timestamp}`;
+          const hasResume = l.resumeFile && l.resumeFile.data ? '📎 有' : '—';
           return `
           <tr>
+            <td>${l.nickname || '未署名'}</td>
             <td><span class="identity-tag">${getIdentityLabel(l.identity, l.otherIdentity)}</span></td>
-            <td>${l.age || '-'}</td>
-            <td>${l.university || '-'}</td>
-            <td class="msg-preview" onclick="showDetail('${key}')">${l.message ? l.message.slice(0,20) + '…' : '-'}</td>
+            <td><span class="degree-tag">${getDegreeLabel(l.degreeStatus)}</span></td>
+            <td>${l.major || '—'}</td>
+            <td>${l.university || '—'}</td>
+            <td class="msg-preview" onclick="showDetail('${key}')">${l.message ? l.message.slice(0,18) + '…' : '—'}</td>
+            <td>${hasResume}</td>
             <td>${l.replyType === 'S' ? '<span class="reply-badge">S级有声</span>' : 'A级电子'}</td>
-            <td>${l.email || '-'}</td>
+            <td>${getSourceLabel(l.source)}</td>
+            <td>${l.email || '—'}</td>
             <td>${formatDate(l.timestamp)}</td>
             <td>${l.replied ? '<span class="reply-badge replied">已回复</span>' : '<span class="reply-badge">待回复</span>'}</td>
             <td>
@@ -218,19 +285,25 @@
       document.getElementById('sCount').innerText = sCount;
     }
 
-    // 加载并应用筛选
     async function loadAndApplyFilters() {
       allLetters = await getLetters();
       const identity = document.getElementById('filterIdentity').value;
-      const university = document.getElementById('filterUniversity').value.trim().toLowerCase();
+      const degree = document.getElementById('filterDegree').value;
+      const keyword = document.getElementById('filterKeyword').value.trim().toLowerCase();
       const replyType = document.getElementById('filterReplyType').value;
+      const source = document.getElementById('filterSource').value;
       const dateFrom = document.getElementById('filterDateFrom').value;
       const dateTo = document.getElementById('filterDateTo').value;
 
       let filtered = [...allLetters];
       if (identity) filtered = filtered.filter(l => l.identity === identity);
-      if (university) filtered = filtered.filter(l => l.university && l.university.toLowerCase().includes(university));
+      if (degree) filtered = filtered.filter(l => l.degreeStatus === degree);
+      if (keyword) filtered = filtered.filter(l => 
+        (l.major && l.major.toLowerCase().includes(keyword)) ||
+        (l.university && l.university.toLowerCase().includes(keyword))
+      );
       if (replyType) filtered = filtered.filter(l => l.replyType === replyType);
+      if (source) filtered = filtered.filter(l => l.source === source);
       if (dateFrom) filtered = filtered.filter(l => l.timestamp >= dateFrom);
       if (dateTo) filtered = filtered.filter(l => l.timestamp <= dateTo + 'T23:59:59');
 
@@ -240,32 +313,45 @@
     document.getElementById('applyFilter').addEventListener('click', loadAndApplyFilters);
     document.getElementById('resetFilter').addEventListener('click', async () => {
       document.getElementById('filterIdentity').value = '';
-      document.getElementById('filterUniversity').value = '';
+      document.getElementById('filterDegree').value = '';
+      document.getElementById('filterKeyword').value = '';
       document.getElementById('filterReplyType').value = '';
+      document.getElementById('filterSource').value = '';
       document.getElementById('filterDateFrom').value = '';
       document.getElementById('filterDateTo').value = '';
       await loadAndApplyFilters();
     });
 
-    // 详情模态框
     function showDetail(key) {
       const l = allLetters.find(letter => (letter.id || `${letter.email}||${letter.timestamp}`) === key);
       if (!l) return;
+
+      let resumeHtml = '无';
+      if (l.resumeFile && l.resumeFile.data) {
+        const fname = l.resumeFile.name || '简历';
+        resumeHtml = `<a class="download-link" onclick="downloadBase64File('${l.resumeFile.data.replace(/'/g, "\\'")}', '${fname}')">📥 下载简历 (${fname})</a>`;
+      }
+
       const content = `
-        <p><strong>身份：</strong>${getIdentityLabel(l.identity, l.otherIdentity)}</p>
-        <p><strong>年龄：</strong>${l.age || '未填'}</p>
-        <p><strong>所在大学：</strong>${l.university || '未填'}</p>
-        <p><strong>来源：</strong>${l.source || '未知'}</p>
-        <p><strong>推荐人：</strong>${l.referee || '无'}</p>
-        <p><strong>回信形式：</strong>${l.replyType === 'S' ? 'S级有声信' : 'A级电子信'}</p>
-        <p><strong>邮箱：</strong>${l.email}</p>
-        <p><strong>时间：</strong>${l.timestamp ? new Date(l.timestamp).toLocaleString() : ''}</p>
-        <p><strong>心声：</strong></p>
-        <div style="background:#f9fafb; padding:12px; border-radius:8px; white-space:pre-wrap;">${l.message || '(无内容)'}</div>
+        <div class="detail-row"><strong>姓名：</strong>${l.nickname || '未署名'}</div>
+        <div class="detail-row"><strong>身份：</strong>${getIdentityLabel(l.identity, l.otherIdentity)}</div>
+        <div class="detail-row"><strong>学历：</strong>${getDegreeLabel(l.degreeStatus)}</div>
+        <div class="detail-row"><strong>专业：</strong>${l.major || '未填'}</div>
+        <div class="detail-row"><strong>所在大学：</strong>${l.university || '未填'}</div>
+        <div class="detail-row"><strong>年龄：</strong>${l.age || '未填'}</div>
+        <div class="detail-row"><strong>来源：</strong>${getSourceLabel(l.source)}</div>
+        <div class="detail-row"><strong>推荐人：</strong>${l.referee || '无'}</div>
+        <div class="detail-row"><strong>回信形式：</strong>${l.replyType === 'S' ? 'S级有声信' : 'A级电子信'}</div>
+        <div class="detail-row"><strong>邮箱：</strong>${l.email}</div>
+        <div class="detail-row"><strong>时间：</strong>${l.timestamp ? new Date(l.timestamp).toLocaleString() : ''}</div>
+        <div class="detail-row"><strong>简历附件：</strong>${resumeHtml}</div>
+        <div style="margin-top:12px;"><strong>心声：</strong></div>
+        <div style="background:#f9fafb; padding:12px; border-radius:8px; white-space:pre-wrap; margin-top:6px;">${l.message || '(无内容)'}</div>
       `;
       document.getElementById('modalContent').innerHTML = content;
       document.getElementById('detailModal').style.display = 'flex';
     }
+
     document.getElementById('closeModal').addEventListener('click', () => {
       document.getElementById('detailModal').style.display = 'none';
     });
@@ -275,7 +361,6 @@
       }
     });
 
-    // 标记已回复
     async function markReplied(key) {
       const idx = allLetters.findIndex(l => (l.id || `${l.email}||${l.timestamp}`) === key);
       if (idx !== -1) {
@@ -285,10 +370,8 @@
       }
     }
 
-    // 初始渲染
     loadAndApplyFilters();
 
-    // 定时刷新（每 30 秒自动拉取一次新数据）
     setInterval(() => {
       loadAndApplyFilters();
     }, 30000);
