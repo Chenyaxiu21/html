@@ -7,7 +7,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>信火相传 · 我在科大等你来</title>
-  <script src="https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -360,7 +359,7 @@
         <input type="email" id="emailInput" placeholder="yourname@example.com" required>
 
         <!-- 新增附件上传区域 -->
-        <label style="margin-top:15px; font-weight:bold;">📎 上传简历（选填）</label>
+        <label style="margin-top:15px; font-weight:bold;">📎 上传简历（选填，以便我们更好地了解你）</label>
         <div class="upload-area">
           <label for="resumeInput">
             <span style="font-size:24px;">📄</span><br>
@@ -490,8 +489,8 @@
       resumeInput.addEventListener('change', function() {
         if (this.files && this.files[0]) {
           const file = this.files[0];
-          if (file.size > 5 * 1024 * 1024) {
-            alert('文件大小不能超过5MB，请重新选择。');
+          if (file.size > 2 * 1024 * 1024) {
+            alert('文件大小不能超过2MB，请重新选择。');
             this.value = '';
             fileNameDisplay.textContent = '';
             return;
@@ -501,26 +500,7 @@
           fileNameDisplay.textContent = '';
         }
       });
-      // 压缩并转换为 Base64 的函数
-      function compressAndToBase64(file) {
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => {
-            const arrayBuffer = reader.result;
-            const uint8Array = new Uint8Array(arrayBuffer);
-            // 使用 pako 进行 gzip 压缩
-            const compressed = pako.gzip(uint8Array);
-            // 创建 Blob 以便安全转换为 Base64
-            const blob = new Blob([compressed], {type: 'application/octet-stream'});
-            const blobReader = new FileReader();
-            blobReader.onload = () => resolve(blobReader.result); // 返回完整 data URL
-            blobReader.onerror = reject;
-            blobReader.readAsDataURL(blob);
-          };
-          reader.onerror = reject;
-          reader.readAsArrayBuffer(file);
-        });
-      }
+
       // 按钮事件
       document.getElementById('startLetter').addEventListener('click', () => showScreen(1));
       document.getElementById('backTo0').addEventListener('click', () => showScreen(0));
