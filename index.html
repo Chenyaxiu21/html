@@ -510,6 +510,13 @@
         if (identity.value === 'other' && !otherInput.value.trim()) {
           alert('请填写具体身份'); return;
         }
+  // 新增：检查姓名
+  const nickname = document.getElementById('nicknameInput').value.trim();
+  if (!nickname) { alert('请填写姓名'); return; }
+
+  // 新增：检查专业
+  const major = document.getElementById('majorInput').value.trim();
+  if (!major) { alert('请填写专业'); return; }
         const university = document.getElementById('universityInput').value.trim();
         if (!university) { alert('请填写所在大学/毕业院校'); return; }
         showScreen(2);
