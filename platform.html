@@ -38,7 +38,6 @@
     .modal-content { background: #fff; border-radius: 16px; padding: 24px; width: 90%; max-width: 600px; max-height: 80vh; overflow-y: auto; position: relative; }
     .close { position: absolute; top: 12px; right: 16px; font-size: 24px; cursor: pointer; color: #6b7280; }
     .empty { text-align: center; padding: 48px; color: #9ca3af; }
-    .download-link { color: #2563eb; text-decoration: underline; cursor: pointer; }
     .detail-row { margin-bottom: 10px; line-height: 1.6; }
     .detail-row strong { display: inline-block; width: 90px; color: #374151; }
   </style>
@@ -123,7 +122,7 @@
             <th>专业</th>
             <th>所在大学</th>
             <th>心声摘要</th>
-            <th>附件</th>
+            <th>简历意愿</th>  <!-- 修改表头：附件 → 简历意愿 -->
             <th>回信形式</th>
             <th>来源</th>
             <th>邮箱</th>
@@ -215,26 +214,11 @@
       return map[val] || val || '—';
     }
 
-    function downloadBase64File(dataUrl, fileName) {
-      if (!dataUrl) return;
-      const arr = dataUrl.split(',');
-      if (arr.length < 2) return;
-      const mime = arr[0].match(/:(.*?);/)?.[1] || 'application/octet-stream';
-      const bstr = atob(arr[1]);
-      let n = bstr.length;
-      const u8arr = new Uint8Array(n);
-      while (n--) {
-        u8arr[n] = bstr.charCodeAt(n);
-      }
-      const blob = new Blob([u8arr], { type: mime });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = fileName || 'resume';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+    // 新增：解析简历意愿
+    function getResumeWishLabel(val) {
+      if (val === 'yes') return '✅ 是';
+      if (val === 'no') return '❌ 否';
+      return '—';
     }
 
     let allLetters = [];
@@ -249,7 +233,8 @@
         emptyHint.style.display = 'none';
         tbody.innerHTML = letters.map((l) => {
           const key = l.id || `${l.email}||${l.timestamp}`;
-          const hasResume = l.resumeFile && l.resumeFile.data ? '📎 有' : '—';
+          // 修改：显示简历意愿而非附件
+          const resumeWishLabel = getResumeWishLabel(l.resumeWish);
           return `
           <tr>
             <td>${l.nickname || '未署名'}</td>
@@ -258,7 +243,7 @@
             <td>${l.major || '—'}</td>
             <td>${l.university || '—'}</td>
             <td class="msg-preview" onclick="showDetail('${key}')">${l.message ? l.message.slice(0,18) + '…' : '—'}</td>
-            <td>${hasResume}</td>
+            <td>${resumeWishLabel}</td>
             <td>${l.replyType === 'S' ? '<span class="reply-badge">S级有声</span>' : 'A级电子'}</td>
             <td>${getSourceLabel(l.source)}</td>
             <td>${l.email || '—'}</td>
@@ -326,10 +311,10 @@
       const l = allLetters.find(letter => (letter.id || `${letter.email}||${letter.timestamp}`) === key);
       if (!l) return;
 
-      let resumeHtml = '无';
-      if (l.resumeFile && l.resumeFile.data) {
-        const fname = l.resumeFile.name || '简历';
-        resumeHtml = `<a class="download-link" onclick="downloadBase64File('${l.resumeFile.data.replace(/'/g, "\\'")}', '${fname}')">📥 下载简历 (${fname})</a>`;
+      // 修改：显示简历意愿
+      let resumeHtml = getResumeWishLabel(l.resumeWish);
+      if (l.resumeWish === 'yes') {
+        resumeHtml += ` <small style="color:#8b6f4c;">（请提醒该生将简历发送至 2461589194@qq.com，主题：姓名+信火相传简历）</small>`;
       }
 
       const content = `
@@ -344,7 +329,7 @@
         <div class="detail-row"><strong>回信形式：</strong>${l.replyType === 'S' ? 'S级有声信' : 'A级电子信'}</div>
         <div class="detail-row"><strong>邮箱：</strong>${l.email}</div>
         <div class="detail-row"><strong>时间：</strong>${l.timestamp ? new Date(l.timestamp).toLocaleString() : ''}</div>
-        <div class="detail-row"><strong>简历附件：</strong>${resumeHtml}</div>
+        <div class="detail-row"><strong>简历意愿：</strong>${resumeHtml}</div>
         <div style="margin-top:12px;"><strong>心声：</strong></div>
         <div style="background:#f9fafb; padding:12px; border-radius:8px; white-space:pre-wrap; margin-top:6px;">${l.message || '(无内容)'}</div>
       `;
