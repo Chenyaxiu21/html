@@ -546,16 +546,6 @@
         });
       });
 
-      // 文件转base64
-      function fileToBase64(file) {
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result);
-          reader.onerror = reject;
-          reader.readAsDataURL(file);
-        });
-      }
-
       // 提交信件
       document.getElementById('submitLetter').addEventListener('click', async function() {
         const email = document.getElementById('emailInput').value.trim();
@@ -584,22 +574,10 @@
         const replyType = replyTypeRadio ? replyTypeRadio.value : 'A';
 
         // 处理简历附件
-        let resumeBase64 = null;
         let resumeFileName = null;
-        if (resumeInput.files && resumeInput.files[0]) {
-          const file = resumeInput.files[0];
-          if (file.size > 50 * 1024) {
-            alert('简历文件不能超过50kb，请压缩后重新上传。');
-            return;
-          }
-          try {
-            resumeBase64 = await fileToBase64(file);
-            resumeFileName = file.name;
-          } catch (err) {
-            alert('简历读取失败，请重试。');
-            return;
-          }
-        }
+if (resumeInput.files && resumeInput.files[0]) {
+  resumeFileName = resumeInput.files[0].name;
+}
 
         const letterData = {
           id: Date.now().toString(36) + Math.random().toString(36).substr(2, 6),
