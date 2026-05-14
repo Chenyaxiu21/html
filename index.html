@@ -489,8 +489,8 @@
       resumeInput.addEventListener('change', function() {
         if (this.files && this.files[0]) {
           const file = this.files[0];
-          if (file.size > 2 * 1024 * 1024) {
-            alert('文件大小不能超过2MB，请重新选择。');
+          if (file.size > 50 * 1024) {
+            alert('文件大小不能超过50kb，请重新选择。');
             this.value = '';
             fileNameDisplay.textContent = '';
             return;
@@ -588,8 +588,8 @@
         let resumeFileName = null;
         if (resumeInput.files && resumeInput.files[0]) {
           const file = resumeInput.files[0];
-          if (file.size > 2 * 1024 * 1024) {
-            alert('简历文件不能超过2MB，请压缩后重新上传。');
+          if (file.size > 50 * 1024) {
+            alert('简历文件不能超过50kb，请压缩后重新上传。');
             return;
           }
           try {
