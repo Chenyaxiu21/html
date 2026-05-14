@@ -201,30 +201,9 @@
       text-align: center; color: #5c4d36; font-size: 14px; margin-bottom: 12px;
       letter-spacing: 2px;
     }
-
-    /* 上传区域样式 */
-    .upload-area {
-      margin: 15px 0;
-      background: #fffcf2;
-      border: 1px dashed #b49460;
-      border-radius: 14px;
-      padding: 12px;
-      text-align: center;
-    }
-    .upload-area label {
-      display: block;
-      cursor: pointer;
-      color: #4a3e2c;
-      font-size: 14px;
-      margin-bottom: 6px;
-    }
-    .upload-area input[type="file"] {
-      display: none;
-    }
-    .file-name {
-      font-size: 13px;
-      color: #a51d1d;
-      margin-top: 4px;
+    /* 简历意愿选择样式 */
+    .resume-option-note {
+      font-size: 12px; color: #8b6f4c; margin-top: 4px; padding-left: 30px;
     }
   </style>
 </head>
@@ -358,16 +337,16 @@
         <label>📧 邮箱（必填，回信唯一通道）</label>
         <input type="email" id="emailInput" placeholder="yourname@example.com" required>
 
-        <!-- 新增附件上传区域 -->
-        <label style="margin-top:15px; font-weight:bold;">📎 上传简历（选填）</label>
-        <div class="upload-area">
-          <label for="resumeInput">
-            <span style="font-size:24px;">📄</span><br>
-            点击此处选择文件<br>
-            <span style="font-size:12px; color:#8b6f4c;">支持 PDF、JPG、PNG，不超过 50kb</span>
+        <!-- 改为询问是否想投递简历 -->
+        <label style="margin-top:15px; font-weight:bold;">📎 是否希望投递个人简历？</label>
+        <div class="radio-group" id="resumeWishGroup">
+          <label class="radio-option">
+            <input type="radio" name="resumeWish" value="yes"> ✅ 是，我想投递简历
           </label>
-          <input type="file" id="resumeInput" accept=".pdf,.jpg,.jpeg,.png">
-          <div class="file-name" id="fileNameDisplay"></div>
+          <p class="resume-option-note">请将简历发送至 <strong>gfkdyzc@nudt.edu.cn</strong>，邮件主题注明“姓名+信火相传简历”</p>
+          <label class="radio-option" style="margin-top:8px;">
+            <input type="radio" name="resumeWish" value="no" checked> ❌ 否，暂不投递
+          </label>
         </div>
 
         <div class="checkbox-item" style="margin-top:15px;">
@@ -483,24 +462,6 @@
       identityRadios.forEach(radio => radio.addEventListener('change', toggleOtherIdentity));
       toggleOtherIdentity();
 
-      // 文件上传展示
-      const resumeInput = document.getElementById('resumeInput');
-      const fileNameDisplay = document.getElementById('fileNameDisplay');
-      resumeInput.addEventListener('change', function() {
-        if (this.files && this.files[0]) {
-          const file = this.files[0];
-          if (file.size > 50 * 1024) {
-            alert('文件大小不能超过50kb，请重新选择。');
-            this.value = '';
-            fileNameDisplay.textContent = '';
-            return;
-          }
-          fileNameDisplay.textContent = '已选择：' + file.name + ' (' + (file.size/1024).toFixed(1) + ' KB)';
-        } else {
-          fileNameDisplay.textContent = '';
-        }
-      });
-
       // 按钮事件
       document.getElementById('startLetter').addEventListener('click', () => showScreen(1));
       document.getElementById('backTo0').addEventListener('click', () => showScreen(0));
@@ -510,13 +471,10 @@
         if (identity.value === 'other' && !otherInput.value.trim()) {
           alert('请填写具体身份'); return;
         }
-  // 新增：检查姓名
-  const nickname = document.getElementById('nicknameInput').value.trim();
-  if (!nickname) { alert('请填写姓名'); return; }
-
-  // 新增：检查专业
-  const major = document.getElementById('majorInput').value.trim();
-  if (!major) { alert('请填写专业'); return; }
+        const nickname = document.getElementById('nicknameInput').value.trim();
+        if (!nickname) { alert('请填写姓名'); return; }
+        const major = document.getElementById('majorInput').value.trim();
+        if (!major) { alert('请填写专业'); return; }
         const university = document.getElementById('universityInput').value.trim();
         if (!university) { alert('请填写所在大学/毕业院校'); return; }
         showScreen(2);
@@ -546,16 +504,6 @@
         });
       });
 
-      // 文件转base64
-      function fileToBase64(file) {
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result);
-          reader.onerror = reject;
-          reader.readAsDataURL(file);
-        });
-      }
-
       // 提交信件
       document.getElementById('submitLetter').addEventListener('click', async function() {
         const email = document.getElementById('emailInput').value.trim();
@@ -582,24 +530,9 @@
         const message = document.getElementById('messageText').value.trim();
         const replyTypeRadio = document.querySelector('input[name="replyType"]:checked');
         const replyType = replyTypeRadio ? replyTypeRadio.value : 'A';
-
-        // 处理简历附件
-        let resumeBase64 = null;
-        let resumeFileName = null;
-        if (resumeInput.files && resumeInput.files[0]) {
-          const file = resumeInput.files[0];
-          if (file.size > 50 * 1024) {
-            alert('简历文件不能超过50kb，请压缩后重新上传。');
-            return;
-          }
-          try {
-            resumeBase64 = await fileToBase64(file);
-            resumeFileName = file.name;
-          } catch (err) {
-            alert('简历读取失败，请重试。');
-            return;
-          }
-        }
+        // 获取简历意愿
+        const resumeWishRadio = document.querySelector('input[name="resumeWish"]:checked');
+        const resumeWish = resumeWishRadio ? resumeWishRadio.value : 'no';
 
         const letterData = {
           id: Date.now().toString(36) + Math.random().toString(36).substr(2, 6),
@@ -615,7 +548,7 @@
           message,
           replyType,
           email,
-          resumeFile: resumeBase64 ? { name: resumeFileName, data: resumeBase64 } : null,
+          resumeWish: resumeWish,  // 仅记录意愿，不保存文件
           replied: false,
           timestamp: new Date().toISOString(),
           campaign: '信火相传'
@@ -684,13 +617,22 @@
 
           console.log('✅ 信件提交成功!');
 
-          // 成功页渲染
+          // 成功页渲染，根据简历意愿显示不同提示
+          let resumeHint = '';
+          if (resumeWish === 'yes') {
+            resumeHint = `<p style="margin-top:16px; color:#4a3e2c; background:#fef9ed; padding:12px; border-radius:12px;">
+              📎 你已选择投递简历，请尽快将简历发送至 <strong>gfkdyzc@nudt.edu.cn</strong><br>
+              邮件主题请注明：<em>${nickname}·信火相传简历</em>，我们将在收到后同步关联。
+            </p>`;
+          }
+
           document.getElementById('formBody').innerHTML =
             '<div class="success-screen">' +
             '<div class="big-icon">✉️✨</div>' +
             '<h2 style="color:#2c3a4b; font-family:\'楷体\',serif;">信已寄出，静候回响</h2>' +
             '<p style="margin:16px 0; color:#3d3221;">你的心声已抵达国防科大研究生院。</p>' +
             '<div class="inline-badge">📬 我们将于 <strong>15个工作日</strong> 内回复至 ' + email + '</div>' +
+            resumeHint +
             '<p style="margin-top:20px; font-style:italic; color:#a51d1d;">"跨越山海的回信，我在科大等你来。"</p>' +
             '<p style="margin-top:25px; color:#4a3e2c; line-height:1.8;">感谢你的来信与信任，每一份真挚的倾诉我们都视若珍宝。<br>愿这封信成为你追梦路上的一盏微光，<br>厚德博学，强军兴国，我们并肩前行。</p>' +
             '<div style="margin-top:15px; font-size:24px; animation: spin 3s linear infinite;">⭐</div>' +
@@ -708,4 +650,4 @@
     })();
   </script>
 </body>
-</html>  
+</html>
