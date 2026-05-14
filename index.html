@@ -288,7 +288,7 @@
         </div>
         <div id="otherIdentityContainer" class="hidden">
           <label for="otherIdentityInput" style="font-weight:bold;">请填写具体身份</label>
-          <input type="text" id="otherIdentityInput" placeholder="例如：高中教师、科研工作者…">
+          <input type="text" id="otherIdentityInput" placeholder="例如：高中教师、科研工作者…" required>
         </div>
         <label style="font-weight:bold;">学历状态</label>
         <div class="radio-group" id="degreeGroup">
@@ -489,8 +489,8 @@
       resumeInput.addEventListener('change', function() {
         if (this.files && this.files[0]) {
           const file = this.files[0];
-          if (file.size > 50 * 1024) {
-            alert('文件大小不能超过50kb，请重新选择。');
+          if (file.size > 2 * 1024 * 1024) {
+            alert('文件大小不能超过2MB，请重新选择。');
             this.value = '';
             fileNameDisplay.textContent = '';
             return;
@@ -546,6 +546,16 @@
         });
       });
 
+      // 文件转base64
+      function fileToBase64(file) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+      }
+
       // 提交信件
       document.getElementById('submitLetter').addEventListener('click', async function() {
         const email = document.getElementById('emailInput').value.trim();
@@ -574,10 +584,22 @@
         const replyType = replyTypeRadio ? replyTypeRadio.value : 'A';
 
         // 处理简历附件
+        let resumeBase64 = null;
         let resumeFileName = null;
-if (resumeInput.files && resumeInput.files[0]) {
-  resumeFileName = resumeInput.files[0].name;
-}
+        if (resumeInput.files && resumeInput.files[0]) {
+          const file = resumeInput.files[0];
+          if (file.size > 2 * 1024 * 1024) {
+            alert('简历文件不能超过2MB，请压缩后重新上传。');
+            return;
+          }
+          try {
+            resumeBase64 = await fileToBase64(file);
+            resumeFileName = file.name;
+          } catch (err) {
+            alert('简历读取失败，请重试。');
+            return;
+          }
+        }
 
         const letterData = {
           id: Date.now().toString(36) + Math.random().toString(36).substr(2, 6),
@@ -686,4 +708,4 @@ if (resumeInput.files && resumeInput.files[0]) {
     })();
   </script>
 </body>
-</html>
+</html>  
