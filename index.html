@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>信火相传 · 我在科大等你来</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 50%, #ffeaa7 100%);
+      font-family: 'Noto Serif SC', 'Times New Roman', '宋体', '仿宋', '楷体', '华文楷体', 'PingFang SC', 'Microsoft YaHei', serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      background-image: radial-gradient(circle at 30% 20%, rgba(255,236,210,0.8) 0%, rgba(252,182,159,0.6) 50%, rgba(255,234,167,0.4) 100%);
+    }
+    .letter-container {
+      width: 100%;
+      max-width: 460px;
+      background: linear-gradient(145deg, #fff9f0 0%, #fff4e6 50%, #ffe8cc 100%);
+      border-radius: 32px 32px 28px 28px;
+      box-shadow: 0 20px 40px rgba(255,165,0,0.15), 0 0 0 3px rgba(255,200,100,0.3), 0 0 0 6px rgba(255,180,80,0.2);
+      position: relative;
+      overflow: hidden;
+    }
+    .letter-container::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-image: repeating-linear-gradient(45deg, rgba(255,165,0,0.04) 0px, rgba(255,165,0,0.04) 2px, transparent 2px, transparent 8px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .top-seal {
+      position: relative; z-index: 2;
+      background: linear-gradient(135deg, #ff9a56 0%, #ff6b6b 100%);
+      padding: 14px 18px;
+      border-bottom: 3px solid #ffd93d;
+      display: flex; align-items: center; justify-content: space-between;
+      color: #fff5e6; font-weight: bold; letter-spacing: 1.5px;
+      text-shadow: 1px 1px 0 rgba(0,0,0,0.1);
+      animation: glowText 2s ease-in-out infinite alternate;
+    }
+    @keyframes glowText {
+      from { text-shadow: 1px 1px 0 rgba(0,0,0,0.1); }
+      to { text-shadow: 0 0 12px rgba(255,217,102,0.8), 1px 1px 0 rgba(0,0,0,0.1); }
+    }
+    .seal-text { font-size: 18px; display: flex; align-items: center; gap: 5px; }
+    .seal-badge {
+      background: linear-gradient(135deg, #ffd93d 0%, #ffb347 100%);
+      color: #5c3d2e; padding: 3px 14px; border-radius: 20px;
+      font-size: 13px; font-weight: bold;
+      box-shadow: 0 0 12px rgba(255,217,61,0.6);
+      animation: badgePulse 2s ease-in-out infinite;
+    }
+    @keyframes badgePulse {
+      0% { box-shadow: 0 0 8px rgba(255,217,61,0.4); }
+      50% { box-shadow: 0 0 20px rgba(255,217,61,0.8), 0 0 30px rgba(255,179,71,0.4); }
+      100% { box-shadow: 0 0 8px rgba(255,217,61,0.4); }
+    }
+    .progress-area {
+      display: flex; align-items: center; justify-content: center;
+      padding: 14px 16px 2px; background: rgba(255,240,220,0.6); position: relative; z-index: 3;
+    }
+    .step-dot {
+      width: 30px; height: 30px; border-radius: 50%;
+      background: #e8d5b7; display: flex; align-items: center; justify-content: center;
+      color: #5c4d36; font-weight: bold; font-size: 14px; transition: 0.3s;
+      border: 2px solid #d4b896;
+    }
+    .step-dot.active { background: linear-gradient(135deg, #ff9a56 0%, #ff6b6b 100%); border-color: #ffd93d; color: white; box-shadow: 0 0 15px rgba(255,217,61,0.6); }
+    .step-line {
+      width: 36px; height: 3px; background: #d4c4a8; margin: 0 4px; border-radius: 5px; transition: 0.3s;
+    }
+    .step-line.done { background: linear-gradient(90deg, #ff9a56 0%, #ff6b6b 100%); }
+    .form-body { position: relative; z-index: 2; padding: 28px 28px 32px; min-height: 520px; }
+    .screen { display: none; animation: fadeIn 0.35s ease; }
+    .screen.active { display: block; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .title-serif {
+      font-size: 22px; font-weight: 700; color: #5c4d36; margin-bottom: 26px;
+      border-left: 5px solid #ff9a56; padding-left: 14px;
+      font-family: 'Noto Serif SC', '楷体', serif;
+    }
+    .radio-group { display: flex; flex-direction: column; gap: 14px; margin: 20px 0 28px; }
+    .radio-option {
+      background: linear-gradient(145deg, #ffffff 0%, #fff9f0 100%);
+      border: 2px solid #f0e6d3; border-radius: 20px;
+      padding: 16px 18px; display: flex; align-items: center; cursor: pointer; transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(255,165,0,0.08);
+    }
+    .radio-option:hover { border-color: #ff9a56; background: linear-gradient(145deg, #fffef8 0%, #fff4e6 100%); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(255,165,0,0.15); }
+    .radio-option input[type="radio"] {
+      appearance: none; width: 20px; height: 20px; border: 2px solid #d4b896;
+      border-radius: 50%; margin-right: 14px; position: relative; cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .radio-option input[type="radio"]:checked {
+      border-color: #ff9a56; background: linear-gradient(135deg, #ff9a56 0%, #ff6b6b 100%);
+      box-shadow: 0 0 10px rgba(255,154,86,0.4);
+    }
+    .checkbox-item { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+    label { display: block; margin-top: 8px; font-weight: 600; color: #5c4d36; }
+    input[type="text"], input[type="email"], input[type="number"] {
+      width: 100%; padding: 16px 20px; border-radius: 30px; border: 2px solid #f0e6d3;
+      background: linear-gradient(145deg, #ffffff 0%, #fff9f0 100%);
+      font-family: inherit; font-size: 16px; margin: 12px 0 22px; color: #5c4d36;
+      transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(255,165,0,0.06);
+    }
+    input[type="text"]:focus, input[type="email"]:focus, input[type="number"]:focus {
+      border-color: #ff9a56; outline: none; box-shadow: 0 0 15px rgba(255,154,86,0.3), 0 4px 12px rgba(255,165,0,0.15);
+    }
+    textarea {
+      width: 100%; border: 2px solid #f0e6d3; border-radius: 22px; padding: 18px;
+      font-size: 16px; background: linear-gradient(145deg, #ffffff 0%, #fff9f0 100%);
+      resize: vertical; font-family: inherit; margin: 14px 0 24px; color: #5c4d36;
+      min-height: 150px; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(255,165,0,0.06);
+    }
+    textarea:focus {
+      border-color: #ff9a56; outline: none; box-shadow: 0 0 15px rgba(255,154,86,0.3), 0 4px 12px rgba(255,165,0,0.15);
+    }
+    .quadrant-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 22px 0 18px; }
+    .quadrant-card {
+      background: linear-gradient(145deg, #ffffff 0%, #fff9f0 100%);
+      border: 2px solid #f0e6d3; border-radius: 22px;
+      padding: 20px 14px; text-align: center; font-size: 14px; cursor: pointer;
+      transition: all 0.3s ease; color: #5c4d36; font-weight: 500;
+      box-shadow: 0 4px 12px rgba(255,165,0,0.1);
+    }
+    .quadrant-card:hover {
+      transform: translateY(-3px); border-color: #ff9a56;
+      box-shadow: 0 8px 20px rgba(255,165,0,0.2);
+    }
+    .quadrant-card:active { background: linear-gradient(145deg, #fff4e6 0%, #ffe8cc 100%); border-color: #ff6b6b; transform: scale(0.97); }
+    .quadrant-icon { font-size: 24px; display: block; margin-bottom: 4px; }
+    .nav-buttons { display: flex; justify-content: space-between; margin-top: 32px; }
+    .btn {
+      background: linear-gradient(135deg, #ff9a56 0%, #ff6b6b 100%);
+      border: none; color: white; padding: 12px 28px;
+      border-radius: 35px; font-weight: bold; letter-spacing: 1px; cursor: pointer;
+      transition: all 0.3s ease; font-family: inherit; touch-action: manipulation;
+      box-shadow: 0 4px 15px rgba(255,107,107,0.3);
+    }
+    .btn.primary { background: linear-gradient(135deg, #ff6b6b 0%, #ff9a56 100%); box-shadow: 0 4px 20px rgba(255,107,107,0.4); }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255,107,107,0.5); }
+    .btn:active { transform: translateY(0) scale(0.98); }
+    .envelope-icon { font-size: 42px; margin: 8px 0; }
+    .small-note { font-size: 12px; color: #6b5e4b; margin-top: 6px; text-align: center; }
+    .success-screen { text-align: center; padding: 20px; }
+    .success-screen .big-icon { font-size: 64px; margin-bottom: 15px; }
+    .inline-badge {
+      background: #e7dcc7; padding: 6px 14px; border-radius: 20px;
+      font-size: 13px; display: inline-block; margin: 8px 0;
+    }
+    .hidden { display: none; }
+
+    /* 国防科大装饰元素 */
+    .watermark {
+      position: absolute; bottom: 8px; right: 12px;
+      font-size: 14px; color: rgba(255,154,86,0.15); font-weight: bold;
+      letter-spacing: 4px; pointer-events: none; z-index: 1;
+    }
+    .screen-home {
+      position: relative; z-index: 2;
+    }
+    .bg-grid {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background-image: 
+        linear-gradient(rgba(255,165,0,0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,165,0,0.08) 1px, transparent 1px);
+      background-size: 30px 30px; pointer-events: none; z-index: 0;
+    }
+    .float-element {
+      position: absolute; pointer-events: none; opacity: 0.35;
+      animation: floatAround 6s ease-in-out infinite; font-size: 24px;
+      filter: drop-shadow(0 2px 4px rgba(255,165,0,0.2));
+    }
+    @keyframes floatAround {
+      0% { transform: translateY(0px) rotate(0deg); opacity: 0.3; }
+      50% { transform: translateY(-12px) rotate(8deg); opacity: 0.45; }
+      100% { transform: translateY(0px) rotate(0deg); opacity: 0.3; }
+    }
+    .envelope-wrapper {
+      position: relative; width: 80px; height: 80px;
+      margin: 0 auto 10px; display: flex; align-items: center; justify-content: center;
+    }
+    .envelope-wrapper::before {
+      content: ''; position: absolute; width: 100%; height: 100%;
+      border: 2px dashed #ff9a56; border-radius: 50%;
+      animation: spin 10s linear infinite;
+    }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .envelope-wrapper .envelope-icon { font-size: 42px; z-index: 1; position: relative; }
+    .preface {
+      background: linear-gradient(145deg, #ffffff 0%, #fff9f0 100%);
+      border: 2px solid #f0e6d3; border-radius: 20px;
+      padding: 20px 18px; margin: 16px 0; position: relative;
+      box-shadow: 0 4px 16px rgba(255,165,0,0.12);
+    }
+    .preface::before {
+      content: "“"; font-size: 48px; color: #ff9a56; opacity: 0.3;
+      position: absolute; top: -8px; left: 12px; font-family: serif;
+    }
+    .preface p { line-height: 1.9; color: #5c4d36; margin-bottom: 12px; text-indent: 2em; }
+    .preface .signature { text-align: right; margin-top: 14px; font-style: italic; color: #8b7355; }
+    .open-seal-animation { cursor: pointer; transition: transform 0.2s; }
+    .open-seal-animation:active { transform: scale(1.05); }
+    .title-glow {
+      text-align: center; border: none; font-size: 24px;
+      font-weight: 700; color: #5c4d36; margin: 10px 0 5px;
+      text-shadow: 0 0 8px rgba(255,154,86,0.4);
+    }
+    .subtitle {
+      text-align: center; color: #5c4d36; font-size: 14px; margin-bottom: 12px;
+      letter-spacing: 2px;
+    }
+    /* 简历意愿选择样式 */
+    .resume-option-note {
+      font-size: 12px; color: #8b6f4c; margin-top: 4px; padding-left: 30px;
+    }
+  </style>
+</head>
+<body>
+  <div class="letter-container" id="letterApp">
+    <div class="top-seal">
+      <span class="seal-text">📮 信火相传 · 我在科大等你来</span>
+      <span class="seal-badge">国防科技大学研究生院</span>
+    </div>
+    <div class="progress-area" id="progressBar">
+      <div class="step-dot active" id="dot1">1</div>
+      <div class="step-line" id="line1"></div>
+      <div class="step-dot" id="dot2">2</div>
+      <div class="step-line" id="line2"></div>
+      <div class="step-dot" id="dot3">3</div>
+      <div class="step-line" id="line3"></div>
+      <div class="step-dot" id="dot4">4</div>
+    </div>
+    <div class="form-body" id="formBody">
+      <!-- 首页：温馨版 -->
+      <div class="screen active screen-home" id="screen0">
+        <div class="bg-grid"></div>
+        <span class="float-element" style="top:8%;left:5%;animation-delay:0s;font-size:22px;">🌸</span>
+        <span class="float-element" style="top:18%;right:6%;animation-delay:1.5s;font-size:26px;">🌟</span>
+        <span class="float-element" style="bottom:25%;left:8%;animation-delay:3s;font-size:24px;"> </span>
+        <span class="float-element" style="top:35%;right:12%;animation-delay:0.8s;font-size:28px;">✨</span>
+        <span class="float-element" style="bottom:15%;right:10%;animation-delay:2.2s;font-size:22px;"> </span>
+        <span class="float-element" style="top:10%;right:25%;animation-delay:4s;font-size:20px;">💫</span>
+        <span class="float-element" style="bottom:10%;left:15%;animation-delay:1.8s;font-size:26px;">🌈</span>
+
+        <div class="envelope-wrapper">
+          <div class="envelope-icon open-seal-animation" id="openSealIcon">✉️🔐</div>
+        </div>
+        <div class="title-glow">信火相传</div>
+        <div class="subtitle">厚德博学 · 强军兴国</div>
+        <p style="text-align:center; color:#4a3e2c; margin:12px 0;">点击上方钥匙，开启这封只属于你的信。</p>
+
+        <div class="preface" id="prefaceLetter" style="display:none;">
+          <p>亲爱的追梦人：</p>
+          <p>当你展开这封信，你已踏入国防科大研究生院的星辰大海。无论你是正在备考的本科生，还是已在科研路上探索的硕士，这里有一群老师和学长学姐，愿意倾听你的困惑，回应你的迷茫。</p>
+          <p>写下你的心声，让信火相传，让每一份迷茫都有回响。</p>
+          <div class="signature">—— 国防科技大学研究生招生办公室</div>
+        </div>
+
+        <div style="text-align:center; margin-top:20px;" id="startBtnContainer" class="hidden">
+          <button class="btn primary" id="startLetter">  开始书写</button>
+        </div>
+        <div class="watermark">国防科技大学</div>
+      </div>
+
+      <!-- 第一步：你是谁 -->
+      <div class="screen" id="screen1">
+        <div class="title-serif">🧑‍🎓 第一步 · 你是谁？</div>
+        <label style="font-weight:bold;">姓名</label>
+        <input type="text" id="nicknameInput" placeholder="真实姓名" required>
+        <label style="font-weight:bold;">身份</label>
+        <div class="radio-group" id="identityGroup">
+          <label class="radio-option"><input type="radio" name="identity" value="student" checked> 🎓 在校学生</label>
+          <label class="radio-option"><input type="radio" name="identity" value="parent"> 👨‍👩‍👧 学生家长</label>
+          <label class="radio-option"><input type="radio" name="identity" value="other"> 🧑‍🏫 其他</label>
+        </div>
+        <div id="otherIdentityContainer" class="hidden">
+          <label for="otherIdentityInput" style="font-weight:bold;">请填写具体身份</label>
+          <input type="text" id="otherIdentityInput" placeholder="例如：高中教师、科研工作者…" required>
+        </div>
+        <label style="font-weight:bold;">学历状态</label>
+        <div class="radio-group" id="degreeGroup">
+          <label class="radio-option"><input type="radio" name="degreeStatus" value="undergraduate" checked> 📘 本科在读</label>
+          <label class="radio-option"><input type="radio" name="degreeStatus" value="master"> 📙 硕士在读</label>
+          <label class="radio-option"><input type="radio" name="degreeStatus" value="graduated"> 🎓 已毕业</label>
+        </div>
+        <label for="majorInput" style="font-weight:bold;">专业</label>
+        <input type="text" id="majorInput" placeholder="例如：计算机科学、航空宇航、电子对抗…" required>
+        <label for="universityInput" style="font-weight:bold;">所在大学</label>
+        <input type="text" id="universityInput" placeholder="请输入院校全称，如：国防科技大学" required>
+        <label for="ageInput" style="font-weight:bold;">年龄</label>
+        <input type="text" id="ageInput" placeholder="如22" required>
+        <label style="font-weight:bold;">你从哪里知道我们？</label>
+        <div class="radio-group" style="gap:6px;">
+          <label class="radio-option"><input type="radio" name="source" value="wechat"> 📱 公众号推文</label>
+          <label class="radio-option"><input type="radio" name="source" value="douyin"> 🎵 抖音短视频</label>
+          <label class="radio-option"><input type="radio" name="source" value="senior"> 👥 学长/老师推荐</label>
+          <label class="radio-option"><input type="radio" name="source" value="other_source"> 🌐 其他</label>
+        </div>
+        <div id="refereeHint" style="background:#f3e3c9; padding:8px 14px; border-radius:20px; margin-top:10px; display:none; font-size:14px;"></div>
+        <div class="nav-buttons">
+          <button class="btn" id="backTo0">← 返回</button>
+          <button class="btn primary" id="toScreen2">下一步 · 分享心声</button>
+        </div>
+        <div class="watermark">国防科技大学</div>
+      </div>
+
+      <div class="screen" id="screen2">
+        <div class="title-serif">✍️ 第二步 · 你的心声</div>
+        <p style="font-size:13px; color:#5c4d36; margin-bottom:6px;">点击象限，可快速填入引导语（也可自由书写）</p>
+        <div class="quadrant-grid">
+          <div class="quadrant-card" data-quadrant="policy"><span class="quadrant-icon">📋</span> 迷彩青春问</div>
+          <div class="quadrant-card" data-quadrant="research"><span class="quadrant-icon">🔬</span> 科研攀登感</div>
+          <div class="quadrant-card" data-quadrant="life"><span class="quadrant-icon">⚽</span> 军校生活探</div>
+          <div class="quadrant-card" data-quadrant="dream"><span class="quadrant-icon">🚀</span> 远大理想志</div>
+        </div>
+        <textarea id="messageText" rows="5" placeholder="写下你的困惑、迷茫、好奇或梦想…"></textarea>
+        <div class="nav-buttons">
+          <button class="btn" id="backTo1">← 返回</button>
+          <button class="btn primary" id="toScreen3">下一步 · 选择回信</button>
+        </div>
+        <div class="watermark">国防科技大学</div>
+      </div>
+
+      <div class="screen" id="screen3">
+        <div class="title-serif">📨 第三步 · 希望收到的回信形式</div>
+        <div style="margin:20px 0;">
+          <div style="display:flex; flex-direction:column; gap:14px;">
+            <label class="radio-option" style="margin:0;">
+              <input type="radio" name="replyType" value="A" checked> 📄 A级·电子信（一封长信，字里行间藏着科大的温柔）
+            </label>
+            <label class="radio-option" style="margin:0;">
+              <input type="radio" name="replyType" value="S"> 🎧 S级·有声信（一段声波，耳机里传来真挚的回响）
+            </label>
+          </div>
+        </div>
+        <div class="nav-buttons">
+          <button class="btn" id="backTo2">← 返回</button>
+          <button class="btn primary" id="toScreen4">最后一步 · 留下邮箱</button>
+        </div>
+        <div class="watermark">国防科技大学</div>
+      </div>
+
+      <div class="screen" id="screen4">
+        <div class="title-serif">📬 最后一步 · 回信寄往哪里？</div>
+        <label>📧 邮箱（必填，回信唯一通道）</label>
+        <input type="email" id="emailInput" placeholder="yourname@example.com" required>
+
+        <!-- 改为询问是否想投递简历 -->
+        <label style="margin-top:15px; font-weight:bold;">📎 是否希望投递个人简历？</label>
+        <div class="radio-group" id="resumeWishGroup">
+          <label class="radio-option">
+            <input type="radio" name="resumeWish" value="yes"> ✅ 是，我想投递简历
+          </label>
+          <p class="resume-option-note">请将简历发送至 <strong>gfkdyzc@nudt.edu.cn</strong>，邮件主题注明“姓名+信火相传简历”</p>
+          <label class="radio-option" style="margin-top:8px;">
+            <input type="radio" name="resumeWish" value="no" checked> ❌ 否，暂不投递
+          </label>
+        </div>
+
+        <div class="checkbox-item" style="margin-top:15px;">
+          <input type="checkbox" id="privacyConsent"> 🔒 我已阅读并同意<span style="color:#a51d1d;">隐私保护条款</span>（信件及简历仅回信人可见）
+        </div>
+        <p class="small-note" style="text-align:left; color:#8b6f4c;">你的简历与信件同样会被严格保密，仅用于招生咨询回复。</p>
+
+        <div class="nav-buttons">
+          <button class="btn" id="backTo3">← 返回</button>
+          <button class="btn primary" id="submitLetter">  发送心语</button>
+        </div>
+        <p class="small-note">⏳ 承诺15个工作日内回信</p>
+        <div class="watermark">国防科技大学</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      // 屏幕管理
+      const screens = {
+        s0: document.getElementById('screen0'),
+        s1: document.getElementById('screen1'),
+        s2: document.getElementById('screen2'),
+        s3: document.getElementById('screen3'),
+        s4: document.getElementById('screen4')
+      };
+      const dots = {
+        d1: document.getElementById('dot1'),
+        d2: document.getElementById('dot2'),
+        d3: document.getElementById('dot3'),
+        d4: document.getElementById('dot4')
+      };
+      const lines = {
+        l1: document.getElementById('line1'),
+        l2: document.getElementById('line2'),
+        l3: document.getElementById('line3')
+      };
+
+      let currentScreen = 0;
+      const screenToProgress = {0:0, 1:1, 2:2, 3:3, 4:4};
+
+      function showScreen(n) {
+        Object.values(screens).forEach(s => s.classList.remove('active'));
+        const key = 's'+n;
+        if (screens[key]) screens[key].classList.add('active');
+        currentScreen = n;
+        updateProgress();
+      }
+
+      function updateProgress() {
+        const activeCount = screenToProgress[currentScreen] || 0;
+        [dots.d1, dots.d2, dots.d3, dots.d4].forEach(d => d.className = 'step-dot');
+        [lines.l1, lines.l2, lines.l3].forEach(l => l.className = 'step-line');
+        if (activeCount >= 1) dots.d1.classList.add('active');
+        if (activeCount >= 2) {
+          dots.d2.classList.add('active');
+          lines.l1.classList.add('done');
+        }
+        if (activeCount >= 3) {
+          dots.d3.classList.add('active');
+          lines.l2.classList.add('done');
+        }
+        if (activeCount >= 4) {
+          dots.d4.classList.add('active');
+          lines.l3.classList.add('done');
+        }
+      }
+
+      // 推荐人参数读取
+      function getQueryParam(param) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(param);
+      }
+      const referee = getQueryParam('ref');
+      if (referee) {
+        const hintDiv = document.getElementById('refereeHint');
+        hintDiv.innerText = '🎖️ 推荐人：' + decodeURIComponent(referee);
+        hintDiv.style.display = 'block';
+        const seniorRadio = document.querySelector('input[name="source"][value="senior"]');
+        if (seniorRadio) seniorRadio.checked = true;
+      }
+
+      // 卷首语交互
+      const openSealIcon = document.getElementById('openSealIcon');
+      const prefaceLetter = document.getElementById('prefaceLetter');
+      const startBtnContainer = document.getElementById('startBtnContainer');
+      let sealOpened = false;
+
+      openSealIcon.addEventListener('click', function() {
+        if (sealOpened) return;
+        sealOpened = true;
+        openSealIcon.innerHTML = '✉️✨';
+        openSealIcon.style.animation = 'fadeIn 0.5s ease';
+        prefaceLetter.style.display = 'block';
+        startBtnContainer.classList.remove('hidden');
+      });
+
+      // 其他身份输入框
+      const identityRadios = document.querySelectorAll('input[name="identity"]');
+      const otherContainer = document.getElementById('otherIdentityContainer');
+      const otherInput = document.getElementById('otherIdentityInput');
+
+      function toggleOtherIdentity() {
+        const selected = document.querySelector('input[name="identity"]:checked');
+        if (selected && selected.value === 'other') {
+          otherContainer.classList.remove('hidden');
+        } else {
+          otherContainer.classList.add('hidden');
+          if (otherInput) otherInput.value = '';
+        }
+      }
+      identityRadios.forEach(radio => radio.addEventListener('change', toggleOtherIdentity));
+      toggleOtherIdentity();
+
+      // 按钮事件
+      document.getElementById('startLetter').addEventListener('click', () => showScreen(1));
+      document.getElementById('backTo0').addEventListener('click', () => showScreen(0));
+      document.getElementById('toScreen2').addEventListener('click', () => {
+        const identity = document.querySelector('input[name="identity"]:checked');
+        if (!identity) { alert('请选择您的身份'); return; }
+        if (identity.value === 'other' && !otherInput.value.trim()) {
+          alert('请填写具体身份'); return;
+        }
+        const nickname = document.getElementById('nicknameInput').value.trim();
+        if (!nickname) { alert('请填写姓名'); return; }
+        const major = document.getElementById('majorInput').value.trim();
+        if (!major) { alert('请填写专业'); return; }
+        const university = document.getElementById('universityInput').value.trim();
+        if (!university) { alert('请填写所在大学/毕业院校'); return; }
+        showScreen(2);
+      });
+      document.getElementById('backTo1').addEventListener('click', () => showScreen(1));
+      document.getElementById('toScreen3').addEventListener('click', () => showScreen(3));
+      document.getElementById('backTo2').addEventListener('click', () => showScreen(2));
+      document.getElementById('toScreen4').addEventListener('click', () => showScreen(4));
+      document.getElementById('backTo3').addEventListener('click', () => showScreen(3));
+
+      // 象限引导语
+      const quadrantGuides = {
+        policy: '我想了解具体的报考政策、体检标准、专业选择等问题。',
+        research: '我正在做某方向的课题，感到迷茫，请问科大的学长是如何度过科研瓶颈期的？',
+        life: '我想知道军校生的一天是怎么过的？',
+        dream: '我梦想研究北斗系统/攻克超算难题，离这个梦想还有多远？'
+      };
+      document.querySelectorAll('.quadrant-card').forEach(card => {
+        card.addEventListener('click', function() {
+          const key = this.dataset.quadrant;
+          const textarea = document.getElementById('messageText');
+          if (textarea.value.trim() === '') {
+            textarea.value = quadrantGuides[key] || '';
+          } else {
+            textarea.value += '\n' + (quadrantGuides[key] || '');
+          }
+        });
+      });
+
+      // 提交信件
+      document.getElementById('submitLetter').addEventListener('click', async function() {
+        const email = document.getElementById('emailInput').value.trim();
+        if (!email || !email.includes('@') || !email.includes('.')) {
+          alert('请填写有效的邮箱地址，以便我们回信。');
+          return;
+        }
+        if (!document.getElementById('privacyConsent').checked) {
+          alert('请阅读并同意隐私保护条款。');
+          return;
+        }
+
+        const nickname = document.getElementById('nicknameInput').value.trim();
+        const identityRadio = document.querySelector('input[name="identity"]:checked');
+        const identity = identityRadio ? identityRadio.value : '';
+        const otherIdentity = (identity === 'other') ? otherInput.value.trim() : '';
+        const degreeRadio = document.querySelector('input[name="degreeStatus"]:checked');
+        const degreeStatus = degreeRadio ? degreeRadio.value : '';
+        const major = document.getElementById('majorInput').value.trim();
+        const age = document.getElementById('ageInput').value.trim();
+        const university = document.getElementById('universityInput').value.trim();
+        const sourceRadio = document.querySelector('input[name="source"]:checked');
+        const source = sourceRadio ? sourceRadio.value : '';
+        const message = document.getElementById('messageText').value.trim();
+        const replyTypeRadio = document.querySelector('input[name="replyType"]:checked');
+        const replyType = replyTypeRadio ? replyTypeRadio.value : 'A';
+        // 获取简历意愿
+        const resumeWishRadio = document.querySelector('input[name="resumeWish"]:checked');
+        const resumeWish = resumeWishRadio ? resumeWishRadio.value : 'no';
+
+        const letterData = {
+          id: Date.now().toString(36) + Math.random().toString(36).substr(2, 6),
+          nickname: nickname || null,
+          identity,
+          otherIdentity: otherIdentity || null,
+          degreeStatus: degreeStatus || null,
+          major: major || null,
+          age: age || null,
+          university,
+          source,
+          referee: referee || null,
+          message,
+          replyType,
+          email,
+          resumeWish: resumeWish,  // 仅记录意愿，不保存文件
+          replied: false,
+          timestamp: new Date().toISOString(),
+          campaign: '信火相传'
+        };
+
+        console.log('📨 信件数据：', letterData);
+
+        // ⚠️ 请替换为你自己的 JSONBin.io 凭据
+        const BIN_ID = '6a0525d8adc21f119a98caab';
+        const MASTER_KEY = '$2a$10$lViKxa8mlqMOUQ5u0jAxIetNJPAAYIsFbAU2r7eAwmMLFAKJ4844W';
+
+        console.log('🔄 开始提交到 JSONBin...');
+
+        try {
+          const testUrl = 'https://api.jsonbin.io/v3/b/' + BIN_ID + '/latest';
+
+          let getResponse;
+          try {
+            getResponse = await fetch(testUrl, {
+              headers: { 'X-Master-Key': MASTER_KEY }
+            });
+          } catch (netErr) {
+            console.error('❌ 网络请求失败:', netErr);
+            if (window.location.protocol === 'file:') {
+              alert('⚠️ 当前通过 file:// 协议打开，浏览器禁止跨域请求。\n\n请通过本地服务器打开此页面（如使用 Live Server 插件，或部署到服务器上访问）。');
+            } else if (netErr.message && netErr.message.includes('NetworkError')) {
+              alert('⚠️ 网络连接失败，JSONBin.io 服务不可达。\n\n可能原因：\n1. 网络不通，请检查网络连接\n2. JSONBin.io 服务暂时不可用\n3. 浏览器阻止了跨域请求\n\n请打开浏览器控制台 (F12) 查看详细错误。');
+            } else {
+              alert('❌ 提交失败: ' + (netErr.message || '未知网络错误'));
+            }
+            return;
+          }
+
+          if (!getResponse.ok) {
+            const errText = await getResponse.text();
+            console.error('❌ 读取 Bin 失败:', errText);
+            if (getResponse.status === 401 || getResponse.status === 403) {
+              alert('⚠️ 鉴权失败！\n\nMASTER_KEY 不正确或已失效。请到 JSONBin.io 重新获取 Key 并替换代码中的 MASTER_KEY。');
+            } else if (getResponse.status === 404) {
+              alert('⚠️ Bin 不存在！\n\nBIN_ID 无效或已被删除。请到 JSONBin.io 创建一个新 Bin，并更新代码中的 BIN_ID。');
+            } else {
+              alert('⚠️ 读取数据失败 (HTTP ' + getResponse.status + ')。请打开浏览器控制台 (F12) 查看详情。');
+            }
+            return;
+          }
+
+          const getData = await getResponse.json();
+          const existingLetters = Array.isArray(getData.record) ? getData.record : [];
+          existingLetters.push(letterData);
+
+          const putResponse = await fetch('https://api.jsonbin.io/v3/b/' + BIN_ID, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-Master-Key': MASTER_KEY
+            },
+            body: JSON.stringify(existingLetters)
+          });
+
+          if (!putResponse.ok) {
+            const putErrText = await putResponse.text();
+            console.error('❌ 上传失败:', putErrText);
+            alert('⚠️ 上传数据失败 (HTTP ' + putResponse.status + ')。请打开浏览器控制台 (F12) 查看详情。');
+            return;
+          }
+
+          console.log('✅ 信件提交成功!');
+
+          // 成功页渲染，根据简历意愿显示不同提示
+          let resumeHint = '';
+          if (resumeWish === 'yes') {
+            resumeHint = `<p style="margin-top:16px; color:#4a3e2c; background:#fef9ed; padding:12px; border-radius:12px;">
+              📎 你已选择投递简历，请尽快将简历发送至 <strong>gfkdyzc@nudt.edu.cn</strong><br>
+              邮件主题请注明：<em>${nickname}·信火相传简历</em>，我们将在收到后同步关联。
+            </p>`;
+          }
+
+          document.getElementById('formBody').innerHTML =
+            '<div class="success-screen">' +
+            '<div class="big-icon">✉️✨</div>' +
+            '<h2 style="color:#2c3a4b; font-family:\'楷体\',serif;">信已寄出，静候回响</h2>' +
+            '<p style="margin:16px 0; color:#3d3221;">你的心声已抵达国防科大研究生院。</p>' +
+            '<div class="inline-badge">📬 我们将于 <strong>15个工作日</strong> 内回复至 ' + email + '</div>' +
+            resumeHint +
+            '<p style="margin-top:20px; font-style:italic; color:#a51d1d;">"跨越山海的回信，我在科大等你来。"</p>' +
+            '<p style="margin-top:25px; color:#4a3e2c; line-height:1.8;">感谢你的来信与信任，每一份真挚的倾诉我们都视若珍宝。<br>愿这封信成为你追梦路上的一盏微光，<br>厚德博学，强军兴国，我们并肩前行。</p>' +
+            '<div style="margin-top:15px; font-size:24px; animation: spin 3s linear infinite;">⭐</div>' +
+            '</div>';
+          Object.values(dots).forEach(d => d.classList.add('active'));
+          Object.values(lines).forEach(l => l.classList.add('done'));
+
+        } catch (error) {
+          console.error('❌ 提交失败：', error);
+          alert('信件投递失败\n\n错误：' + (error.message || '未知错误') + '\n\n请打开浏览器控制台 (F12) 查看更多日志。');
+        }
+      });
+
+      updateProgress();
+    })();
+  </script>
+</body>
+</html>
