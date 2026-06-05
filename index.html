@@ -889,11 +889,209 @@
         }
       }
 
-      // ... (quadrant guides, step navigation, submit logic remain identical to previous version)
-      // Due to space, they are omitted here but are present in the full implementation.
+            // ===== Quadrant Guides =====
+      var quadrantGuides = {
+        policy: '我想了解具体的报考政策、体检标准、专业选择等问题。',
+        research: '我正在做某方向的课题，感到迷茫，请问科大的学长是如何度过科研瓶颈期的？',
+        life: '我想知道军校生的一天是怎么过的？',
+        dream: '我梦想研究北斗系统/攻克超算难题，离这个梦想还有多远？'
+      };
+      document.querySelectorAll('.quadrant-card').forEach(function(card) {
+        card.addEventListener('click', function() {
+          var key = this.dataset.quadrant;
+          var textarea = document.getElementById('messageText');
+          if (textarea.value.trim() === '') {
+            textarea.value = quadrantGuides[key] || '';
+          } else {
+            textarea.value += '\n' + (quadrantGuides[key] || '');
+          }
+        });
+      });
+
+      // ===== Step Navigation =====
+      var toScreen2Btn = document.getElementById('toScreen2');
+      if (toScreen2Btn) {
+        toScreen2Btn.addEventListener('click', function() {
+          var identity = document.querySelector('input[name="identity"]:checked');
+          if (!identity) { alert('请选择您的身份'); return; }
+          if (identity.value === 'other' && otherInput && !otherInput.value.trim()) {
+            alert('请填写具体身份'); return;
+          }
+          var nickname = document.getElementById('nicknameInput').value.trim();
+          if (!nickname) { alert('请填写姓名'); return; }
+          var major = document.getElementById('majorInput').value.trim();
+          if (!major) { alert('请填写专业'); return; }
+          var university = document.getElementById('universityInput').value.trim();
+          if (!university) { alert('请填写所在大学/毕业院校'); return; }
+          updateProgress(2);
+          showPage('page-step2');
+        });
+      }
+
+      var backTo1Btn = document.getElementById('backTo1');
+      if (backTo1Btn) backTo1Btn.addEventListener('click', function() { showPage('page-step1'); });
+
+      var toScreen3Btn = document.getElementById('toScreen3');
+      if (toScreen3Btn) toScreen3Btn.addEventListener('click', function() {
+        updateProgress(3);
+        showPage('page-step3');
+      });
+
+      var backTo2Btn = document.getElementById('backTo2');
+      if (backTo2Btn) backTo2Btn.addEventListener('click', function() { showPage('page-step2'); });
+
+      var toScreen4Btn = document.getElementById('toScreen4');
+      if (toScreen4Btn) toScreen4Btn.addEventListener('click', function() {
+        updateProgress(4);
+        showPage('page-step4');
+      });
+
+      var backTo3Btn = document.getElementById('backTo3');
+      if (backTo3Btn) backTo3Btn.addEventListener('click', function() { showPage('page-step3'); });
+
+      // ===== Referee Parameter =====
+      function getQueryParam(param) {
+        var urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(param);
+      }
+      var referee = getQueryParam('ref');
+      if (referee) {
+        var hintDiv = document.getElementById('refereeHint');
+        if (hintDiv) {
+          hintDiv.innerText = '🎖️ 推荐人：' + decodeURIComponent(referee);
+          hintDiv.style.display = 'block';
+        }
+        var seniorRadio = document.querySelector('input[name="source"][value="senior"]');
+        if (seniorRadio) seniorRadio.checked = true;
+      }
+
+      // ===== Submit Letter =====
+      var submitBtn = document.getElementById('submitLetter');
+      if (submitBtn) {
+        submitBtn.addEventListener('click', async function() {
+          var email = document.getElementById('emailInput').value.trim();
+          if (!email || !email.includes('@') || !email.includes('.')) {
+            alert('请填写有效的邮箱地址，以便我们回信。');
+            return;
+          }
+          if (!document.getElementById('privacyConsent').checked) {
+            alert('请阅读并同意隐私保护条款。');
+            return;
+          }
+
+          var nickname = document.getElementById('nicknameInput').value.trim();
+          var identityRadio = document.querySelector('input[name="identity"]:checked');
+          var identity = identityRadio ? identityRadio.value : '';
+          var otherIdentity = (identity === 'other') ? (otherInput ? otherInput.value.trim() : '') : '';
+          var degreeRadio = document.querySelector('input[name="degreeStatus"]:checked');
+          var degreeStatus = degreeRadio ? degreeRadio.value : '';
+          var major = document.getElementById('majorInput').value.trim();
+          var age = document.getElementById('ageInput').value.trim();
+          var university = document.getElementById('universityInput').value.trim();
+          var sourceRadio = document.querySelector('input[name="source"]:checked');
+          var source = sourceRadio ? sourceRadio.value : '';
+          var message = document.getElementById('messageText').value.trim();
+          var replyTypeRadio = document.querySelector('input[name="replyType"]:checked');
+          var replyType = replyTypeRadio ? replyTypeRadio.value : 'A';
+          var resumeWishRadio = document.querySelector('input[name="resumeWish"]:checked');
+          var resumeWish = resumeWishRadio ? resumeWishRadio.value : 'no';
+
+          var letterData = {
+            id: Date.now().toString(36) + Math.random().toString(36).substr(2, 6),
+            nickname: nickname || null,
+            identity: identity,
+            otherIdentity: otherIdentity || null,
+            degreeStatus: degreeStatus || null,
+            major: major || null,
+            age: age || null,
+            university: university,
+            source: source,
+            referee: referee || null,
+            message: message,
+            replyType: replyType,
+            email: email,
+            resumeWish: resumeWish,
+            replied: false,
+            timestamp: new Date().toISOString(),
+            campaign: '信火相传'
+          };
+
+          console.log('📨 信件数据：', letterData);
+
+          var BIN_ID = '6a0525d8adc21f119a98caab';
+          var MASTER_KEY = '$2a$10$lViKxa8mlqMOUQ5u0jAxIetNJPAAYIsFbAU2r7eAwmMLFAKJ4844W';
+
+          try {
+            var testUrl = 'https://api.jsonbin.io/v3/b/' + BIN_ID + '/latest';
+            var getResponse;
+            try {
+              getResponse = await fetch(testUrl, {
+                headers: { 'X-Master-Key': MASTER_KEY }
+              });
+            } catch (netErr) {
+              console.error('❌ 网络请求失败:', netErr);
+              alert('❌ 提交失败: ' + (netErr.message || '未知网络错误'));
+              return;
+            }
+
+            if (!getResponse.ok) {
+              var errText = await getResponse.text();
+              console.error('❌ 读取 Bin 失败:', errText);
+              alert('⚠️ 读取数据失败 (HTTP ' + getResponse.status + ')');
+              return;
+            }
+
+            var getData = await getResponse.json();
+            var existingLetters = Array.isArray(getData.record) ? getData.record : [];
+            existingLetters.push(letterData);
+
+            var putResponse = await fetch('https://api.jsonbin.io/v3/b/' + BIN_ID, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-Master-Key': MASTER_KEY
+              },
+              body: JSON.stringify(existingLetters)
+            });
+
+            if (!putResponse.ok) {
+              var putErrText = await putResponse.text();
+              console.error('❌ 上传失败:', putErrText);
+              alert('⚠️ 上传数据失败 (HTTP ' + putResponse.status + ')');
+              return;
+            }
+
+            console.log('✅ 信件提交成功!');
+
+            var resumeHint = '';
+            if (resumeWish === 'yes') {
+              resumeHint = '<p style="margin-top:16px; color:#4a3e2c; background:#fef9ed; padding:12px; border-radius:12px; font-size:13px;">📎 您已选择投递简历，请尽快将简历发送至 <strong>gfkdyzc@nudt.edu.cn</strong><br>邮件主题请注明：<em>' + nickname + '·信火相传简历</em>，我们将在收到后同步关联。</p>';
+            }
+
+            var formBody = document.getElementById('page-step4').querySelector('.sub-body');
+            formBody.innerHTML =
+              '<div class="success-screen">' +
+              '<div class="big-icon">✉️✨</div>' +
+              '<h2 style="color:#2c3a4b; font-family:\'Noto Serif SC\',serif; font-size:20px;">信已寄出，静候回响</h2>' +
+              '<p style="margin:14px 0; color:#3d3221; font-size:14px;">您的心声已抵达国防科大研究生院。</p>' +
+              '<div class="inline-badge">📬 我们将于 <strong>15个工作日</strong> 内回复至 ' + email + '</div>' +
+              resumeHint +
+              '<p style="margin-top:18px; font-style:italic; color:#C43A3A; font-size:14px;">"跨越山海的回信，我在科大等你来。"</p>' +
+              '<p style="margin-top:20px; color:#4a3e2c; line-height:1.8; font-size:13px;">感谢您的来信与信任，每一份真挚的倾诉我们都视若珍宝。<br>愿这封信成为你追梦路上的一盏微光，<br>厚德博学，强军兴国，我们并肩前行。</p>' +
+              '<div style="margin-top:15px; font-size:24px; animation: spin 3s linear infinite;">⭐</div>' +
+              '<button class="start-letter-btn" style="margin-top:20px;" onclick="showPage(\'page-home\')">🏠 返回首页</button>' +
+              '</div>';
+
+          } catch (error) {
+            console.error('❌ 提交失败：', error);
+            alert('信件投递失败\n\n错误：' + (error.message || '未知错误'));
+          }
+        });
+      }
       // Please refer to the previous answer for the complete JavaScript logic.
 
       window.showPage = showPage;
+      function updateMainNav() {}
       updateProgress(1);
     })();
   </script>
