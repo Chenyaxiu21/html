@@ -6,14 +6,8 @@
   <title>信火相传 · 信件管理中心</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif; background: #f0f2f5; display: flex; }
-    .sidebar {
-      width: 220px; background: #0a1622; color: #fff; min-height: 100vh; padding: 24px 16px;
-    }
-    .sidebar h2 { font-size: 20px; margin-bottom: 32px; display: flex; align-items: center; gap: 8px; }
-    .sidebar a { color: #aab4c0; text-decoration: none; display: block; padding: 10px 12px; border-radius: 8px; margin-bottom: 6px; }
-    .sidebar a.active, .sidebar a:hover { background: #1e3b5a; color: #fff; }
-    .main { flex: 1; padding: 24px 32px; overflow-y: auto; }
+    body { font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif; background: #f0f2f5; }
+    .main { padding: 24px 32px; overflow-y: auto; }
     .stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 24px; }
     .stat-card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
     .stat-card .number { font-size: 32px; font-weight: 700; color: #1e2f3f; }
@@ -23,35 +17,56 @@
     .filter-group label { font-size: 13px; color: #4b5563; font-weight: 500; }
     .filter-group select, .filter-group input { padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; }
     .table-container { background: #fff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; min-width: 1200px; }
+    table { width: 100%; border-collapse: collapse; min-width: 1400px; }
     th { background: #f9fafb; padding: 12px 10px; text-align: left; font-weight: 600; color: #374151; font-size: 13px; border-bottom: 1px solid #e5e7eb; white-space: nowrap; }
     td { padding: 12px 10px; border-bottom: 1px solid #f3f4f6; font-size: 13px; color: #1f2937; }
     .identity-tag { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 11px; background: #e0e7ff; color: #3730a3; white-space: nowrap; }
     .degree-tag { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 11px; background: #fce7f3; color: #9d174d; white-space: nowrap; }
     .reply-badge { background: #fef3c7; color: #92400e; padding: 2px 8px; border-radius: 12px; font-size: 11px; white-space: nowrap; }
     .replied { background: #d1fae5; color: #065f46; }
+    .exported-badge { background: #e5e7eb; color: #4b5563; padding: 2px 8px; border-radius: 12px; font-size: 11px; }
     .msg-preview { max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; color: #2563eb; text-decoration: underline; }
     .btn { padding: 6px 12px; border: none; border-radius: 8px; cursor: pointer; font-size: 12px; white-space: nowrap; }
     .btn-reply { background: #1e3b5a; color: #fff; }
-    .btn-reply:disabled { background: #9ca3af; }
+    .btn-export { background: #047857; color: #fff; }
+    .btn:disabled { background: #9ca3af; cursor: not-allowed; }
     .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
     .modal-content { background: #fff; border-radius: 16px; padding: 24px; width: 90%; max-width: 600px; max-height: 80vh; overflow-y: auto; position: relative; }
     .close { position: absolute; top: 12px; right: 16px; font-size: 24px; cursor: pointer; color: #6b7280; }
     .empty { text-align: center; padding: 48px; color: #9ca3af; }
     .detail-row { margin-bottom: 10px; line-height: 1.6; }
     .detail-row strong { display: inline-block; width: 90px; color: #374151; }
+    .login-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(15,23,42,0.9); display: flex; justify-content: center; align-items: center; z-index: 9999;
+    }
+    .login-box { background: #fff; padding: 40px; border-radius: 16px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+    .login-box input { margin: 10px 0; padding: 10px; width: 200px; border-radius: 8px; border: 1px solid #ccc; }
+    .login-box .btn { margin-top: 10px; width: 200px; padding: 12px; }
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+    .header h1 { margin: 0; }
+    .export-area { margin-bottom: 20px; display: flex; gap: 10px; align-items: center; }
+    .export-area select { padding: 8px 12px; border-radius: 8px; border: 1px solid #d1d5db; }
   </style>
 </head>
 <body>
-  <div class="sidebar">
-    <h2>📮 信火相传</h2>
-    <a href="#" class="active">📬 信件管理</a>
-    <a href="#">⭐ 星火图鉴</a>
-    <a href="#">📊 数据统计</a>
+
+  <!-- 登录验证界面 -->
+  <div class="login-overlay" id="loginOverlay">
+    <div class="login-box">
+      <h2>📮 信火相传 · 管理中心</h2>
+      <p style="margin-top: 8px; color: #4b5563;">请输入管理员密码</p>
+      <input type="password" id="passwordInput" placeholder="密码" onkeydown="if(event.key==='Enter') checkLogin()">
+      <button class="btn btn-reply" onclick="checkLogin()">进入系统</button>
+      <p id="loginError" style="color: red; margin-top: 8px; display: none;">密码错误</p>
+    </div>
   </div>
 
-  <div class="main">
-    <h1 style="margin-bottom: 24px;">信件管理中心</h1>
+  <div class="main" id="mainContent" style="display: none;">
+    <div class="header">
+      <h1>信件管理中心</h1>
+      <button class="btn" style="background:#e5e7eb;" onclick="logout()">退出登录</button>
+    </div>
 
     <!-- 统计卡片 -->
     <div class="stats">
@@ -111,23 +126,35 @@
       <button class="btn" style="background:#e5e7eb;" id="resetFilter">重置</button>
     </div>
 
+    <!-- CSV 导出区域 -->
+    <div class="export-area">
+      <select id="exportSelect">
+        <option value="all">导出全部（不含已导出）</option>
+        <option value="selected">导出选中项</option>
+      </select>
+      <button class="btn btn-export" onclick="exportCSV()">📥 导出CSV</button>
+      <span style="font-size:13px; color:#6b7280;" id="exportHint"></span>
+    </div>
+
     <!-- 信件表格 -->
     <div class="table-container">
       <table>
         <thead>
           <tr>
+            <th><input type="checkbox" id="selectAll" onchange="toggleAllCheckboxes(this)"></th>
             <th>姓名</th>
             <th>身份</th>
             <th>学历</th>
             <th>专业</th>
             <th>所在大学</th>
             <th>心声摘要</th>
-            <th>简历意愿</th>  <!-- 修改表头：附件 → 简历意愿 -->
+            <th>简历意愿</th>
             <th>回信形式</th>
             <th>来源</th>
             <th>邮箱</th>
             <th>时间</th>
             <th>状态</th>
+            <th>已导出</th>
             <th>操作</th>
           </tr>
         </thead>
@@ -147,10 +174,47 @@
   </div>
 
   <script>
-    // ===== 请替换成你自己的 JSONBin 凭据 =====
+    // ===== 配置 =====
     const BIN_ID = '6a0525d8adc21f119a98caab';
     const MASTER_KEY = '$2a$10$lViKxa8mlqMOUQ5u0jAxIetNJPAAYIsFbAU2r7eAwmMLFAKJ4844W';
+    const ADMIN_PASSWORD = 'xinghuo2025'; // 可自行修改管理员密码
 
+    // ===== 登录验证 =====
+    const loginOverlay = document.getElementById('loginOverlay');
+    const mainContent = document.getElementById('mainContent');
+    const passwordInput = document.getElementById('passwordInput');
+    const loginError = document.getElementById('loginError');
+
+    function checkLogin() {
+      if (passwordInput.value === ADMIN_PASSWORD) {
+        loginOverlay.style.display = 'none';
+        mainContent.style.display = 'block';
+        sessionStorage.setItem('xinghuo_admin', 'true');
+        loadAndApplyFilters();
+      } else {
+        loginError.style.display = 'block';
+      }
+    }
+
+    function logout() {
+      sessionStorage.removeItem('xinghuo_admin');
+      loginOverlay.style.display = 'flex';
+      mainContent.style.display = 'none';
+      passwordInput.value = '';
+      loginError.style.display = 'none';
+    }
+
+    // 页面加载时检查登录状态
+    if (sessionStorage.getItem('xinghuo_admin') === 'true') {
+      loginOverlay.style.display = 'none';
+      mainContent.style.display = 'block';
+      loadAndApplyFilters();
+    } else {
+      loginOverlay.style.display = 'flex';
+      mainContent.style.display = 'none';
+    }
+
+    // ===== 数据获取与存储 =====
     async function getLetters() {
       try {
         const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
@@ -181,9 +245,11 @@
         if (!res.ok) throw new Error('保存失败');
       } catch (err) {
         console.error('保存信件出错：', err);
+        throw err;
       }
     }
 
+    // ===== 工具函数 =====
     function formatDate(iso) {
       if (!iso) return '';
       const d = new Date(iso);
@@ -214,29 +280,32 @@
       return map[val] || val || '—';
     }
 
-    // 新增：解析简历意愿
     function getResumeWishLabel(val) {
       if (val === 'yes') return '✅ 是';
       if (val === 'no') return '❌ 否';
       return '—';
     }
 
+    // ===== 全局数据 =====
     let allLetters = [];
 
+    // ===== 渲染表格 =====
     function render(letters) {
       const tbody = document.getElementById('tableBody');
       const emptyHint = document.getElementById('emptyHint');
       if (!letters.length) {
         tbody.innerHTML = '';
         emptyHint.style.display = 'block';
+        document.getElementById('exportHint').innerText = '';
       } else {
         emptyHint.style.display = 'none';
         tbody.innerHTML = letters.map((l) => {
           const key = l.id || `${l.email}||${l.timestamp}`;
-          // 修改：显示简历意愿而非附件
           const resumeWishLabel = getResumeWishLabel(l.resumeWish);
+          const exported = l.exported || false;
           return `
-          <tr>
+          <tr data-key="${key}">
+            <td><input type="checkbox" class="row-checkbox" data-key="${key}" onchange="updateSelectAll()"></td>
             <td>${l.nickname || '未署名'}</td>
             <td><span class="identity-tag">${getIdentityLabel(l.identity, l.otherIdentity)}</span></td>
             <td><span class="degree-tag">${getDegreeLabel(l.degreeStatus)}</span></td>
@@ -249,11 +318,13 @@
             <td>${l.email || '—'}</td>
             <td>${formatDate(l.timestamp)}</td>
             <td>${l.replied ? '<span class="reply-badge replied">已回复</span>' : '<span class="reply-badge">待回复</span>'}</td>
+            <td>${exported ? '<span class="exported-badge">已导出</span>' : '—'}</td>
             <td>
               <button class="btn btn-reply" ${l.replied ? 'disabled' : ''} onclick="markReplied('${key}')">${l.replied ? '已回复' : '标记回复'}</button>
             </td>
           </tr>
         `}).join('');
+        document.getElementById('exportHint').innerText = `共 ${letters.length} 封信件`;
       }
       updateStats(letters);
     }
@@ -270,6 +341,7 @@
       document.getElementById('sCount').innerText = sCount;
     }
 
+    // ===== 筛选逻辑 =====
     async function loadAndApplyFilters() {
       allLetters = await getLetters();
       const identity = document.getElementById('filterIdentity').value;
@@ -289,10 +361,11 @@
       );
       if (replyType) filtered = filtered.filter(l => l.replyType === replyType);
       if (source) filtered = filtered.filter(l => l.source === source);
-      if (dateFrom) filtered = filtered.filter(l => l.timestamp >= dateFrom);
+      if (dateFrom) filtered = filtered.filter(l => l.timestamp >= dateFrom + 'T00:00:00');
       if (dateTo) filtered = filtered.filter(l => l.timestamp <= dateTo + 'T23:59:59');
 
       render(filtered);
+      document.getElementById('selectAll').checked = false;
     }
 
     document.getElementById('applyFilter').addEventListener('click', loadAndApplyFilters);
@@ -307,14 +380,14 @@
       await loadAndApplyFilters();
     });
 
+    // ===== 详情弹窗 =====
     function showDetail(key) {
       const l = allLetters.find(letter => (letter.id || `${letter.email}||${letter.timestamp}`) === key);
       if (!l) return;
 
-      // 修改：显示简历意愿
       let resumeHtml = getResumeWishLabel(l.resumeWish);
       if (l.resumeWish === 'yes') {
-        resumeHtml += ` <small style="color:#8b6f4c;">（请提醒该生将简历发送至 2461589194@qq.com，主题：姓名+信火相传简历）</small>`;
+        resumeHtml += ` <small style="color:#8b6f4c;">（提醒该生将简历发送至 gfkdyzc@nudt.edu.cn，主题：姓名+信火相传简历）</small>`;
       }
 
       const content = `
@@ -346,20 +419,133 @@
       }
     });
 
+    // ===== 标记回复（即时反馈） =====
     async function markReplied(key) {
       const idx = allLetters.findIndex(l => (l.id || `${l.email}||${l.timestamp}`) === key);
-      if (idx !== -1) {
-        allLetters[idx].replied = true;
+      if (idx === -1) return;
+
+      allLetters[idx].replied = true;
+      // 先更新 UI
+      const row = document.querySelector(`tr[data-key="${key}"]`);
+      if (row) {
+        const badge = row.querySelector('.reply-badge');
+        if (badge) {
+          badge.className = 'reply-badge replied';
+          badge.innerText = '已回复';
+        }
+        const btn = row.querySelector('.btn-reply');
+        if (btn) {
+          btn.disabled = true;
+          btn.innerText = '已回复';
+        }
+      }
+      // 更新统计
+      const displayed = Array.from(document.querySelectorAll('#tableBody tr')).length;
+      // 临时统计（基于 allLetters 和当前过滤？更简单的做法是重新统计 allLetters）
+      updateStats(allLetters);
+
+      // 异步保存到服务器
+      try {
         await saveLetters(allLetters);
-        await loadAndApplyFilters();
+        console.log('回复状态已保存');
+      } catch (err) {
+        alert('保存失败，请重试');
+        // 如果保存失败，恢复状态
+        allLetters[idx].replied = false;
+        if (row) {
+          const badge = row.querySelector('.reply-badge');
+          if (badge) {
+            badge.className = 'reply-badge';
+            badge.innerText = '待回复';
+          }
+          const btn = row.querySelector('.btn-reply');
+          if (btn) {
+            btn.disabled = false;
+            btn.innerText = '标记回复';
+          }
+        }
       }
     }
 
-    loadAndApplyFilters();
+    // ===== 导出 CSV =====
+    function exportCSV() {
+      const mode = document.getElementById('exportSelect').value;
+      let dataToExport = [];
 
-    setInterval(() => {
-      loadAndApplyFilters();
-    }, 30000);
+      if (mode === 'selected') {
+        const checkedKeys = Array.from(document.querySelectorAll('.row-checkbox:checked')).map(cb => cb.dataset.key);
+        dataToExport = allLetters.filter(l => {
+          const key = l.id || `${l.email}||${l.timestamp}`;
+          return checkedKeys.includes(key) && !l.exported; // 已导出的跳过
+        });
+        if (dataToExport.length === 0) {
+          alert('请至少选中一条未导出的信件');
+          return;
+        }
+      } else {
+        // 导出全部，但跳过已导出的
+        dataToExport = allLetters.filter(l => !l.exported);
+        if (dataToExport.length === 0) {
+          alert('没有可导出的信件（所有信件均已导出）');
+          return;
+        }
+      }
+
+      // 构建 CSV 内容
+      const headers = ['姓名','身份','学历','专业','所在大学','心声','简历意愿','回信形式','来源','邮箱','时间','已回复','已导出'];
+      const rows = dataToExport.map(l => [
+        l.nickname || '',
+        getIdentityLabel(l.identity, l.otherIdentity),
+        getDegreeLabel(l.degreeStatus),
+        l.major || '',
+        l.university || '',
+        l.message ? l.message.replace(/,/g, '，').replace(/\n/g, ' ') : '',
+        getResumeWishLabel(l.resumeWish),
+        l.replyType === 'S' ? 'S级有声信' : 'A级电子信',
+        getSourceLabel(l.source),
+        l.email || '',
+        l.timestamp ? new Date(l.timestamp).toLocaleString() : '',
+        l.replied ? '是' : '否',
+        l.exported ? '是' : '否'
+      ]);
+
+      const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+      const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `信火相传_${new Date().toISOString().slice(0,10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      // 标记为已导出
+      dataToExport.forEach(l => {
+        const idx = allLetters.findIndex(letter => (letter.id || `${letter.email}||${letter.timestamp}`) === (l.id || `${l.email}||${l.timestamp}`));
+        if (idx !== -1) allLetters[idx].exported = true;
+      });
+      // 更新表格显示已导出状态
+      render(allLetters); // 重新渲染当前筛选视图可能丢失筛选，所以用保存后重新筛选
+      saveLetters(allLetters).then(() => {
+        loadAndApplyFilters(); // 重新加载保持筛选条件
+      });
+    }
+
+    // ===== 全选 / 取消全选 =====
+    function toggleAllCheckboxes(source) {
+      const checkboxes = document.querySelectorAll('.row-checkbox');
+      checkboxes.forEach(cb => cb.checked = source.checked);
+    }
+
+    function updateSelectAll() {
+      const allCheckboxes = document.querySelectorAll('.row-checkbox');
+      const checkedCount = document.querySelectorAll('.row-checkbox:checked').length;
+      document.getElementById('selectAll').checked = checkedCount === allCheckboxes.length;
+    }
+
+    // 初始加载
+    loadAndApplyFilters();
   </script>
 </body>
 </html>
