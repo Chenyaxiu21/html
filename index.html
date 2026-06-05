@@ -70,7 +70,7 @@
     }
 
     .home-con {
-      width: 100%; position: absolute; left: 0; top: 44%; transform: translateY(-50%); z-index: 3;
+      width: 100%; position: absolute; left: 0; top: 36%; transform: translateY(-50%); z-index: 3;
     }
 
     .home-emblem {
@@ -130,7 +130,37 @@
     .nav-btn .icon { font-size: 24px; margin-bottom: 4px; line-height: 1; }
     .nav-btn .label { font-size: 11px; white-space: nowrap; font-weight: 500; }
 
-    /* ----- 首页按钮组（调整为拆信入口） ----- */
+    /* ----- 开启信封大按钮（独立放置在靠上位置） ----- */
+    .envelope-entry {
+      position: absolute;
+      top: 58%;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 3;
+      cursor: pointer;
+      background: rgba(255,255,255,0.12);
+      backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      border: 2px solid rgba(255,215,0,0.35);
+      border-radius: 20px;
+      padding: 10px 28px;
+      display: flex; align-items: center; gap: 10px;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.25), 0 0 30px rgba(255,215,0,0.1);
+    }
+    .envelope-entry:active {
+      transform: translateX(-50%) scale(0.94);
+      background: rgba(255,215,0,0.2);
+      border-color: rgba(255,215,0,0.6);
+    }
+    .envelope-entry .entry-icon { font-size: 30px; line-height: 1; }
+    .envelope-entry .entry-text { color: rgba(255,255,255,0.95); font-size: 14px; font-weight: 600; letter-spacing: 2px; }
+    @keyframes entryGlow {
+      0%, 100% { box-shadow: 0 8px 30px rgba(0,0,0,0.25), 0 0 30px rgba(255,215,0,0.1); }
+      50% { box-shadow: 0 8px 35px rgba(0,0,0,0.3), 0 0 50px rgba(255,215,0,0.2); }
+    }
+    .envelope-entry { animation: entryGlow 3s ease-in-out infinite; }
+
+    /* ----- 首页按钮组（底部四个步骤按钮） ----- */
     .btn-group {
       position: absolute;
       bottom: 6%;
@@ -224,6 +254,11 @@
       .btn-group .step-connector { width: 12px; }
       .btn-group .action-btn { padding: 5px 8px; font-size: 10px; }
       .btn-group .action-btn .icon { font-size: 14px; }
+      .envelope-entry { padding: 8px 20px; }
+      .envelope-entry .entry-icon { font-size: 24px; }
+      .envelope-entry .entry-text { font-size: 12px; }
+      .home-con { top: 34%; }
+      .envelope-entry { top: 56%; }
     }
 
     /* ===== Sub Page Common ===== */
@@ -253,10 +288,9 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
-      min-height: calc(100vh - 50px); /* 让内容上下居中 */
+      min-height: calc(100vh - 50px);
       padding: 20px 16px;
     }
-    /* 国防背景装饰元素 */
     .defense-bg {
       position: absolute; left: 0; top: 0; width: 100%; height: 100%;
       pointer-events: none; z-index: 0;
@@ -282,7 +316,6 @@
       50% { transform: translateY(-8px) rotate(10deg); opacity: 0.5; }
       100% { transform: translateY(0) rotate(0deg); opacity: 0.3; }
     }
-    /* 迷彩圆点装饰 */
     .camo-dot {
       position: absolute; width: 12px; height: 12px; border-radius: 50%;
       background: rgba(139,26,26,0.08); animation: pulse 4s infinite;
@@ -295,7 +328,6 @@
       50% { transform: scale(1.3); opacity: 0.2; }
     }
 
-    /* 原有欢迎页样式保持不变 */
     .welcome-section {
       text-align: center; padding: 8px 0; position: relative; z-index: 1;
     }
@@ -343,7 +375,6 @@
     }
     .start-letter-btn:active { transform: scale(0.96); }
 
-    /* 后续表单样式省略（与之前一致） */
     .title-serif {
       font-size: 20px; font-weight: 700; color: #5c4d36; margin-bottom: 20px;
       border-left: 4px solid #C43A3A; padding-left: 12px;
@@ -489,14 +520,15 @@
       <div class="home-quote">我在科大等你来<br>让每一份迷茫都有回响</div>
     </div>
 
-    <!-- 按钮组：第一个按钮改为开启信封 -->
+    <!-- 开启信封大按钮（独立放置在靠上位置） -->
+    <div class="envelope-entry" data-target="page-welcome">
+      <span class="entry-icon">📨</span>
+      <span class="entry-text">开启信封</span>
+    </div>
+
+    <!-- 底部按钮组：四个步骤 + 活动介绍/国防科大 -->
     <div class="btn-group">
       <div class="btn-group-row">
-        <div class="step-btn" data-target="page-welcome">
-          <span class="icon">📨</span>
-          <span class="label">开启信封</span>
-        </div>
-        <div class="step-connector"></div>
         <div class="step-btn" data-target="page-step1">
           <span class="icon">🧑‍🎓</span>
           <span class="label">你是谁</span>
@@ -755,7 +787,7 @@
     </div>
   </div>
 
-  <!-- ===== 国防科大介绍（内容不变） ===== -->
+  <!-- ===== 国防科大介绍 ===== -->
   <div class="page sub-page scroll" id="page-watermark">
     <div class="sub-header">
       <button class="back-btn" data-back>&larr;</button>
@@ -768,10 +800,13 @@
         <div style="font-size:13px; color:#8b7355; letter-spacing:2px;">National University of Defense Technology</div>
       </div>
       <div class="section-card" style="background:white; border-radius:14px; padding:18px; box-shadow:0 2px 10px rgba(0,0,0,0.06); font-size:13px; line-height:1.9; color:#4a3e2c;">
-        <p style="text-indent:2em; margin-bottom:10px;">国防科技大学是中央军委直属的综合性研究型高等教育院校，前身为1953年创建于哈尔滨的“哈军工”，陈赓大将任首任院长。学校是首批进入国家“211工程”“985工程”的院校，也是军队唯一进入“985工程”的高校，2017年、2022年连续入选国家“双一流”建设一流大学A类高校。</p>
-        <p style="text-indent:2em; margin-bottom:10px;">学校拥有经济学、法学、理学、工学、军事学等9个学科门类，下设理学院、计算机学院、电子科学学院、空天科学学院等11个研究生招生单位，现有26个博士学位授权一级学科、29个硕士学位授权一级学科，5个学科入选国家“双一流”建设学科。教学科研人员7000余人，其中两院院士15人，博士生导师660余人，国家级教学团队和创新团队19个。</p>
-        <p style="text-indent:2em; margin-bottom:10px;">学校肩负先进武器装备和国防关键技术研究重任，取得了以巨型计算机、卫星导航系统关键设备、高超声速推进技术、激光陀螺等为代表的重大成果，为我国“两弹一星”和载人航天工程作出重要贡献。现有14个国家级重点实验室、3个国家地方联合工程研究中心，图书馆藏书497余万册，校园网与5G高速互连。</p>
-        <p style="text-indent:2em; margin-bottom:10px;">建校70余年来，学校始终恪守“厚德博学、强军兴国”校训，培养输送了40余万名各类人才，其中700余人担任省部军级以上领导职务，共培养产生75位院士。加入国防科技大学，你将亲身参与国家重大科技攻关，锻炼为国铸器的能力，与民族复兴伟业紧紧相连。点燃青春，书写时代，欢迎报考国防科技大学研究生！</p>
+        <p style="text-indent:2em; margin-bottom:10px;">国防科技大学是中央军委直属的综合性研究型高等教育院校，是第一个五年计划国家 156 项重点建设工程之一，是中共中央 1959 年确定的全国 20 所重点大学之一，是国务院首批批准有权授予硕士、博士学位的院校，是全国首批设立研究生院的 22 所高校之一，是首批进入国家“211 工程”建设计划的院校，是军队唯一进入国家“985 工程”建设行列的院校，2017 年入选国家“双一流”建设一流大学 A 类高校，2022 年入选第二轮国家“双一流”建设高校。</p>
+        <p style="text-indent:2em; margin-bottom:10px;">学校下设理学院、计算机学院、电子科学学院、前沿交叉学科学院、智能科学学院、系统工程学院、空天科学学院、外国语学院（部署在南京）、电子对抗学院（部署在合肥）、气象海洋学院、军政基础教育学院等 11 个研究生招生单位。学校现有学科点涵盖经济学、法学、教育学、文学、理学、工学、军事学、管理学、交叉学科 9 个学科门类，有 26 个博士学位授权一级学科和 29 个硕士学位授权一级学科，3 个专业学位博士学位授权点和 11 个专业学位硕士学位授权点。5 个学科入选国家“双一流”建设学科名单，9 个学科入选湖南省第二轮“双一流”建设学科名单。</p>
+        <p style="text-indent:2em; margin-bottom:10px;">学校拥有一支以两院院士、国内外知名专家为代表的高水平教员队伍。现有教学科研人员 7000余人，博士生导师 660 余人，硕士生导师近 1900 人，其中，中国科学院院士 8 人，中国工程院院士 7人，国家级教学团队 9 个，国家级创新团队 10 个，入选国家、军队重大人才计划人选 700 余人次。</p>
+        <p style="text-indent:2em; margin-bottom:10px;">学校担负着从事先进武器装备和国防关键技术研究的重要任务，形成了以装备科研为主线，武器装备型号、国防关键技术攻关、基础研究相衔接，自然科学、军事科学、社会科学相结合的科研格局，在部分尖端领域创造了中国国防科技史上多项之最，取得了以巨型计算机、卫星导航系统关键设备、高超声速推进技术、激光陀螺等为代表的一大批科研成果，为我国“两弹一星”和载人航天等重大工程作出了重要贡献。</p>
+        <p style="text-indent:2em; margin-bottom:10px;">学校拥有先进的教学、科研实验条件和公共服务体系，现有 14 个国家级重点实验室、3 个国家地方联合工程研究中心、3 个国家级实验教学示范中心、3 个国家级虚拟仿真实验教学中心、11 个军队重点实验室和一批整体水平跨入国内高校先进行列的公共教学实验室。图书馆面积 71108 平方米，各类藏书 497 余万册（件），纸质期刊 2800 种，电子期刊 80000 种。2024 年，图书馆全年引进大型数据库 110 余个。校园网与国际互联网、国家教育科研网、运营商 5G 移动网高速互连，为全校师生的学习、研究、交流提供丰富的网络接入和信息获取渠道。</p>
+        <p style="text-indent:2em; margin-bottom:10px;">学校按照“对党绝对忠诚、科技基础厚实、创新思维敏锐、军事素质过硬、作风纪律优良”的人才培养标准，科学确定学校研究生培养的目标定位，着力为国家和军队现代化建设培养综合素质好、创新能力强的未来领军人物和优秀骨干力量。建校 70 余年来，先后为国家和军队培养输送了 40 余万名各类人才，700 余人担任省、部、军级以上领导职务。据统计，学校共培养产生 75 位院士，1977年以来培养的本科生中产生 20 位院士。</p>
+        <p style="text-indent:2em; margin-bottom:10px;">加入国防科技大学，你将亲身参与国家重大科技攻关项目，锻炼为国铸器的能力，积攒大科学时代携力创新、集智攻关的宝贵经验，体验到与国家富强、民族复兴之伟业紧紧相连的自豪。实现建设世界一流高等教育院校的伟大梦想，期待你的参与；实现中华民族伟大复兴的强国梦强军梦，期待你的加入。点燃青春，书写时代，欢迎报考国防科技大学研究生!</p>
       </div>
       <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;">
         <span style="background:#C43A3A; color:white; padding:4px 14px; border-radius:20px; font-size:11px;">双一流</span>
@@ -809,6 +844,14 @@
           target.classList.add('active');
           target.scrollTop = 0;
         }
+      }
+
+      // 开启信封大按钮（新的 .envelope-entry）
+      var envelopeEntry = document.querySelector('.envelope-entry');
+      if (envelopeEntry) {
+        envelopeEntry.addEventListener('click', function() {
+          showPage(this.getAttribute('data-target'));
+        });
       }
 
       document.querySelectorAll('.nav-btn[data-target]').forEach(function(btn) {
@@ -874,8 +917,7 @@
       identityRadios.forEach(function(r) { r.addEventListener('change', toggleOtherIdentity); });
       toggleOtherIdentity();
 
-      // ===== Progress Update (omitted for brevity, same as before) =====
-      // ... (previous progress update code remains unchanged)
+      // ===== Progress Update =====
       function updateProgress(step) {
         var dots1 = [document.getElementById('dot1'), document.getElementById('dot2'), document.getElementById('dot3'), document.getElementById('dot4')];
         var lines1 = [document.getElementById('line1'), document.getElementById('line2'), document.getElementById('line3')];
@@ -889,7 +931,7 @@
         }
       }
 
-            // ===== Quadrant Guides =====
+      // ===== Quadrant Guides =====
       var quadrantGuides = {
         policy: '我想了解具体的报考政策、体检标准、专业选择等问题。',
         research: '我正在做某方向的课题，感到迷茫，请问科大的学长是如何度过科研瓶颈期的？',
@@ -1088,7 +1130,6 @@
           }
         });
       }
-      // Please refer to the previous answer for the complete JavaScript logic.
 
       window.showPage = showPage;
       function updateMainNav() {}
